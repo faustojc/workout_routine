@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "136833260643",
+    "firebase_url": "https://flutter-workout-routine-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "flutter-workout-routine",
+    "storage_bucket": "flutter-workout-routine.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136833260643:android:b1af3fc579b1ff07ba2c56",
+        "android_client_info": {
+          "package_name": "me.faustojc.workout_routine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDabTQWBo7dkYHIog0uVn4d6-mWGG_JcyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
