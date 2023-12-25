@@ -5,6 +5,7 @@ class Athlete {
   final String id;
   final String firstName;
   final String lastName;
+  final String gender;
   final String country;
   final String city;
   final String address;
@@ -21,6 +22,7 @@ class Athlete {
     required this.id,
     required this.firstName,
     required this.lastName,
+    required this.gender,
     required this.country,
     required this.city,
     required this.address,
@@ -39,6 +41,7 @@ class Athlete {
         id: json['id'],
         firstName: json['firstName'],
         lastName: json['lastName'],
+        gender: json['gender'],
         country: json['country'],
         city: json['city'],
         address: json['address'],
@@ -56,6 +59,7 @@ class Athlete {
         'id': id,
         'firstName': firstName,
         'lastName': lastName,
+        'gender': gender,
         'country': country,
         'city': city,
         'address': address,
