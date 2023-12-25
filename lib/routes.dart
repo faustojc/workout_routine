@@ -34,6 +34,10 @@ class Routes {
     Navigator.of(context).pushNamed(routeName);
   }
 
+  static void redirectTo(BuildContext context, String routeName) {
+    Navigator.of(context).pushReplacementNamed(routeName);
+  }
+
   static void back(BuildContext context) {
     Navigator.of(context).pop();
   }
