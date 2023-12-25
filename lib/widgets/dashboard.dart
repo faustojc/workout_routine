@@ -10,8 +10,6 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
-  final Color _selectedColor = Colors.deepPurple;
-  final Color _unselectedColor = Colors.grey;
 
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home'),
@@ -32,19 +30,19 @@ class _DashboardState extends State<Dashboard> {
           icon: const Icon(CupertinoIcons.house),
           activeIcon: const Icon(CupertinoIcons.house_fill),
           label: 'Home',
-          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.grey,
+          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.white,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.square_list),
           activeIcon: const Icon(CupertinoIcons.square_list_fill),
           label: 'Workouts',
-          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.grey,
+          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.white,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.person),
           activeIcon: const Icon(CupertinoIcons.person_fill),
           label: 'Profile',
-          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.grey,
+          backgroundColor: _selectedIndex == 0 ? Colors.deepPurple : Colors.white,
         ),
       ],
       currentIndex: _selectedIndex,
