@@ -50,30 +50,53 @@ class _LoginFormState extends State<LoginForm> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                const Text(
+                  'HELLO AGAIN',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
                 InputFormField(
-                  type: InputFormFieldType.text,
+                  type: FieldType.text,
                   label: 'Email',
                   controller: _emailController,
                   validator: _validateEmail,
+                  icon: Icons.email_outlined,
+                  decoration: FieldDecoration.borderless,
                 ),
                 const SizedBox(height: 20),
                 InputFormField(
-                  type: InputFormFieldType.password,
+                  type: FieldType.password,
                   label: 'Password',
                   controller: _passwordController,
                   validator: _validatePassword,
+                  icon: Icons.lock_outline,
+                  decoration: FieldDecoration.borderless,
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _login,
-                  child: const Text('Login'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: FilledButton.tonal(
+                        onPressed: _login,
+                        child: const Text('Login'),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30),
                 TextButton(
                   onPressed: () {
-                    Routes.to(context, '/register');
+                    Routes.redirectTo(context, "/register");
                   },
-                  child: const Text('Don\'t have an account? Sign up!'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Don\'t have an account?', style: TextStyle(color: Colors.grey.shade800)),
+                      const SizedBox(width: 5),
+                      const Text('Register'),
+                    ],
+                  ),
                 ),
               ],
             ),
