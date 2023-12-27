@@ -17,19 +17,34 @@ class InputFormField extends StatefulWidget {
   final FieldType type;
   final FieldDecoration decoration;
   final IconData? icon;
+  final IconData? suffixIcon;
   final String? label;
   final String? hint;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final bool readOnly;
+  final void Function()? onTap;
 
-  const InputFormField({super.key, required this.type, this.decoration = FieldDecoration.outlined, this.label, this.hint, this.controller, this.validator, this.icon});
+  const InputFormField({
+    super.key,
+    required this.type,
+    this.readOnly = false,
+    this.decoration = FieldDecoration.outlined,
+    this.label,
+    this.hint,
+    this.controller,
+    this.validator,
+    this.onTap,
+    this.icon,
+    this.suffixIcon,
+  });
 
   @override
   State<InputFormField> createState() => _InputFormFieldState();
 }
 
 class _InputFormFieldState extends State<InputFormField> {
-  Widget? _suffixIcon = const SizedBox.shrink();
+  Widget? _suffixIcon;
   InputBorder? _border;
   Color? _fillColor;
   late bool _obscureText;
@@ -47,10 +62,12 @@ class _InputFormFieldState extends State<InputFormField> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       );
 
-      _fillColor = Colors.grey.shade200;
+      _fillColor = Colors.purple.shade50;
     }
 
-    if (widget.controller!.text.isNotEmpty) {
+    if (widget.suffixIcon != null) {
+      _suffixIcon = Icon(widget.suffixIcon);
+    } else if (widget.controller!.text.isNotEmpty) {
       if (widget.type == FieldType.password) {
         _suffixIcon = IconButton(
           icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
@@ -78,8 +95,10 @@ class _InputFormFieldState extends State<InputFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       controller: widget.controller,
-      keyboardType: widget.type == FieldType.int ? TextInputType.number : TextInputType.text,
+      keyboardType: (widget.type == FieldType.int || widget.type == FieldType.double) ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         prefixIcon: widget.icon != null ? Icon(widget.icon) : null,
         suffixIcon: _suffixIcon,
