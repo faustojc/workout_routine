@@ -19,7 +19,7 @@ class _LoginFormState extends State<LoginForm> {
       return 'Please enter your email';
     }
 
-    if (value.matchAsPrefix(RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$') as String) != null) {
+    if (value.matchAsPrefix(RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').toString()) != null) {
       return 'Please enter a valid email';
     }
 
