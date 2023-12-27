@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:workout_routine/models/avatars.dart';
-
 class Athlete {
-  final String id;
+  late String? id;
+  final String email;
+  final String password;
   final String firstName;
   final String lastName;
   final String gender;
@@ -11,15 +10,14 @@ class Athlete {
   final String address;
   final num age;
   final num weight;
-  final DateTime birthdate;
+  final DateTime birthday;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final User user;
-  final Avatar? avatar;
-  final Tokens? tokens;
 
   Athlete({
-    required this.id,
+    this.id,
+    required this.email,
+    required this.password,
     required this.firstName,
     required this.lastName,
     required this.gender,
@@ -28,17 +26,18 @@ class Athlete {
     required this.address,
     required this.age,
     required this.weight,
-    required this.birthdate,
+    required this.birthday,
     required this.createdAt,
     required this.updatedAt,
-    required this.user,
-    this.avatar,
-    this.tokens,
   });
+
+  static Athlete? current;
 
   factory Athlete.fromJson(Map<String, dynamic> json) {
     return Athlete(
         id: json['id'],
+        email: json['email'],
+        password: json['password'],
         firstName: json['firstName'],
         lastName: json['lastName'],
         gender: json['gender'],
@@ -47,16 +46,15 @@ class Athlete {
         address: json['address'],
         age: json['age'],
         weight: json['weight'],
-        birthdate: json['birthdate'],
+        birthday: json['birthday'],
         createdAt: json['createdAt'],
-        updatedAt: json['updatedAt'],
-        user: json['user'],
-        avatar: Avatar.fromJson(json['avatar']),
-        tokens: Tokens.fromJson(json['tokens']));
+        updatedAt: json['updatedAt']);
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'email': email,
+        'password': password,
         'firstName': firstName,
         'lastName': lastName,
         'gender': gender,
@@ -65,27 +63,8 @@ class Athlete {
         'address': address,
         'age': age,
         'weight': weight,
-        'birthdate': birthdate,
+        'birthdate': birthday,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
-        'user': user,
-        'avatar': avatar,
-        'tokens': tokens,
       };
-}
-
-class Tokens {
-  final String? authToken;
-  final String? verificationToken;
-  final DateTime? createdAt;
-
-  Tokens({this.createdAt, this.authToken, this.verificationToken});
-
-  factory Tokens.fromJson(Map<String, dynamic> json) {
-    return Tokens(
-      authToken: json['authToken'],
-      verificationToken: json['verificationToken'],
-      createdAt: json['createdAt'],
-    );
-  }
 }
