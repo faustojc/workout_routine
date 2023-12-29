@@ -1,13 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/routes.dart';
-import 'package:workout_routine/widgets/auth/login.dart';
+import 'package:workout_routine/themes/colors.dart';
+import 'package:workout_routine/widgets/auth/main_auth.dart';
 
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform, name: 'Workout Routine');
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MainApp());
 }
@@ -21,10 +22,11 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Workout Routine',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
+        fontFamily: 'SpaceGrotesk',
         useMaterial3: true,
       ),
-      home: const LoginForm(),
+      home: const MainAuth(),
       initialRoute: Routes.initialRoute,
       onGenerateRoute: Routes.generateRoute,
       debugShowCheckedModeBanner: false,
