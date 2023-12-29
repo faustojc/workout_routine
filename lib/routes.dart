@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:workout_routine/widgets/auth/login.dart';
+import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/auth/register.dart';
 import 'package:workout_routine/widgets/dashboard.dart';
 
 class Routes {
-  static String get initialRoute => '/login';
+  static String get initialRoute => '/auth';
 
   // List of routes
   static final Map<String, WidgetBuilder> _routes = {
     '/login': (_) => const LoginForm(),
     '/register': (_) => const RegisterForm(),
     '/dashboard': (_) => const Dashboard(),
+    '/auth': (_) => const MainAuth(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
