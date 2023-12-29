@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_routine/themes/colors.dart';
 
 enum FieldType {
   text,
@@ -44,6 +45,7 @@ class InputFormField extends StatefulWidget {
 }
 
 class _InputFormFieldState extends State<InputFormField> {
+  late TextEditingController _controller;
   Widget? _suffixIcon;
   InputBorder? _border;
   Color? _fillColor;
@@ -52,44 +54,64 @@ class _InputFormFieldState extends State<InputFormField> {
   @override
   void initState() {
     super.initState();
+
     _obscureText = widget.type == FieldType.password;
-
-    if (widget.decoration == FieldDecoration.outlined) {
-      _border = const OutlineInputBorder();
-    } else if (widget.decoration == FieldDecoration.borderless) {
-      _border = const OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      );
-
-      _fillColor = Colors.purple.shade50;
-    }
+    _controller = widget.controller ?? TextEditingController();
 
     if (widget.suffixIcon != null) {
       _suffixIcon = Icon(widget.suffixIcon);
-    } else if (widget.controller!.text.isNotEmpty) {
-      if (widget.type == FieldType.password) {
-        _suffixIcon = IconButton(
-          icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-          onPressed: _setObscureText,
-        );
-      } else {
-        _suffixIcon = IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: _clearText,
-        );
+    } else {
+      _suffixIcon = null;
+    }
+
+    // Add a listener to _controller
+    _controller.addListener(() {
+      if (_suffixIcon == null) {
+        setState(() {
+          if (widget.type == FieldType.password) {
+            _suffixIcon = IconButton(
+              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              onPressed: _setObscureText,
+            );
+          } else if (widget.type == FieldType.text && _controller.text.isNotEmpty) {
+            _suffixIcon = IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: _clearText,
+            );
+          }
+        });
       }
+    });
+
+    if (widget.decoration == FieldDecoration.outlined) {
+      _border = const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      );
+    } else if (widget.decoration == FieldDecoration.borderless) {
+      _border = const OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      );
+
+      _fillColor = ThemeColor.secondary.withOpacity(0.2);
     }
   }
 
   void _setObscureText() {
     setState(() {
       _obscureText = !_obscureText;
+      _suffixIcon = IconButton(
+        icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+        onPressed: _setObscureText,
+      );
     });
   }
 
   void _clearText() {
     widget.controller!.clear();
+    setState(() {
+      _suffixIcon = null;
+    });
   }
 
   @override
