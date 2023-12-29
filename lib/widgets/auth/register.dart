@@ -1,8 +1,10 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/routes.dart';
+import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -22,7 +24,6 @@ class _RegisterFormState extends State<RegisterForm> {
     'age': '',
     'weight': '',
     'birthday': '',
-    'country': '',
     'city': '',
     'address': '',
     'createdAt': DateTime.now(),
@@ -36,23 +37,36 @@ class _RegisterFormState extends State<RegisterForm> {
       Icons.error_outline,
       key: ValueKey(2),
       color: Colors.red,
+      size: 60,
     ),
     const Icon(
       Icons.check_circle_outline,
       key: ValueKey(3),
       color: Colors.green,
+      size: 60,
     ),
   ];
   final List<String> _statusText = <String>[
-    'Loading...',
+    'Registering...',
     'Something went wrong! Try again later.',
     'Registration successful!',
   ];
 
   late Widget _currentStatusIndicator;
   late String _currentStatusText;
-  bool _isLoading = false;
-  bool _hasError = false;
+  late OverlayEntry _overlayAlertStatus;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _overlayAlertStatus = OverlayEntry(
+      builder: (context) => StatusAlertDialog(
+        currentStatusIndicator: _currentStatusIndicator,
+        currentStatusText: _currentStatusText,
+      ),
+    );
+  }
 
   void _register(context) {
     final currentState = userAthleteFormKey.currentState?._formKey.currentState;
@@ -68,116 +82,89 @@ class _RegisterFormState extends State<RegisterForm> {
         return MapEntry(key, value);
       });
 
-      setState(() => _isLoading = true);
-
-      if (_isLoading) {
+      setState(() {
         _currentStatusIndicator = _statusIndicator[0];
         _currentStatusText = _statusText[0];
-      } else if (_hasError) {
-        _currentStatusIndicator = _statusIndicator[1];
-        _currentStatusText = _statusText[1];
-      } else {
-        _currentStatusIndicator = _statusIndicator[2];
-        _currentStatusText = _statusText[2];
-      }
+      });
+      _setOverlayAlertStatus(true);
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                    switchOutCurve: Curves.easeOut,
-                    child: _currentStatusIndicator),
-                const SizedBox(width: 20),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                  switchOutCurve: Curves.easeOut,
-                  child: Text(_currentStatusText),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
-      FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: userInfo['email']!,
-        password: userInfo['password']!,
-      )
-          .then((UserCredential userCredential) {
-        userCredential.user?.updateDisplayName('${userInfo['firstName']} ${userInfo['lastName']}');
+      FirebaseAuth.instance.createUserWithEmailAndPassword(email: userInfo['email']!, password: userInfo['password']!).then((UserCredential user) {
+        user.user?.updateDisplayName('${userInfo['firstName']} ${userInfo['lastName']}');
 
         Athlete.current = Athlete.fromJson(userInfo);
-        Athlete.current?.id = userCredential.user?.uid;
+        Athlete.current?.id = user.user?.uid;
 
         setState(() {
-          _isLoading = false;
-          _hasError = false;
-        });
-        Future.delayed(const Duration(seconds: 2), () {
-          if (!_isLoading || _hasError) {
-            Routes.back(context);
-          }
+          _currentStatusText = _statusText[2];
+          _currentStatusIndicator = _statusIndicator[2];
         });
       }).catchError((err) {
         setState(() {
-          _isLoading = false;
-          _hasError = true;
-        });
+          _currentStatusIndicator = _statusIndicator[1];
 
-        Future.delayed(const Duration(seconds: 2), () {
-          if (!_isLoading || _hasError) {
-            Routes.back(context);
+          if (err.code.contains('email-already-in-use')) {
+            _currentStatusText = 'Email already exists';
+          } else {
+            _currentStatusText = _statusText[1];
           }
         });
-      });
+      }).whenComplete(() => Future.delayed(const Duration(seconds: 3), () => setState(() => _setOverlayAlertStatus(false))));
+    }
+  }
+
+  void _setOverlayAlertStatus(bool show) {
+    if (show) {
+      Overlay.of(context).insert(_overlayAlertStatus);
+    } else {
+      _overlayAlertStatus.remove();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'REGISTER',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Create an account to get started.',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 20),
-            UserAthleteForm(key: userAthleteFormKey),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                _register(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.deepPurple,
+              'Create Your Account',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: ThemeColor.primary,
               ),
-              child: const Text('Register'),
             ),
-            const SizedBox(height: 30),
-            TextButton(
-              onPressed: () => Routes.redirectTo(context, "/login"),
-              child: const Text('Already have an account? Login'),
+            const Text(
+              'Make sure your account is secure',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: ThemeColor.primary,
+              ),
+            ),
+            const SizedBox(height: 40),
+            UserAthleteForm(key: userAthleteFormKey),
+            const SizedBox(height: 40),
+            ConstrainedBox(
+              constraints: const BoxConstraints.tightFor(width: double.infinity, height: 55),
+              child: OutlinedButton(
+                onPressed: () {
+                  _register(context);
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: ThemeColor.white,
+                  backgroundColor: ThemeColor.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                ),
+                child: const Text('Register'),
+              ),
             ),
           ],
         ),
@@ -205,7 +192,6 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
   late TextEditingController _ageController;
   late TextEditingController _weightController;
   late TextEditingController _birthdayController;
-  late TextEditingController _countryController;
   late TextEditingController _cityController;
   late TextEditingController _addressController;
 
@@ -218,10 +204,9 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _firstNameController = TextEditingController(text: _RegisterFormState.userInfo['firstName']);
     _lastNameController = TextEditingController(text: _RegisterFormState.userInfo['lastName']);
     _genderController = TextEditingController(text: _RegisterFormState.userInfo['gender']);
-    _ageController = TextEditingController(text: _RegisterFormState.userInfo['age'].toString());
-    _weightController = TextEditingController(text: _RegisterFormState.userInfo['weight'].toString());
-    _birthdayController = TextEditingController(text: _RegisterFormState.userInfo['birthday']);
-    _countryController = TextEditingController(text: _RegisterFormState.userInfo['country']);
+    _ageController = TextEditingController(text: _RegisterFormState.userInfo['age']);
+    _weightController = TextEditingController(text: _RegisterFormState.userInfo['weight']);
+    _birthdayController = TextEditingController(text: _RegisterFormState.userInfo['birthday'].toString());
     _cityController = TextEditingController(text: _RegisterFormState.userInfo['city']);
     _addressController = TextEditingController(text: _RegisterFormState.userInfo['address']);
 
@@ -245,7 +230,6 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
       }
     });
     _birthdayController.addListener(() => _RegisterFormState.userInfo['birthday'] = _birthdayController.text);
-    _countryController.addListener(() => _RegisterFormState.userInfo['country'] = _countryController.text);
     _cityController.addListener(() => _RegisterFormState.userInfo['city'] = _cityController.text);
     _addressController.addListener(() => _RegisterFormState.userInfo['address'] = _addressController.text);
   }
@@ -262,7 +246,6 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _ageController.dispose();
     _weightController.dispose();
     _birthdayController.dispose();
-    _countryController.dispose();
     _cityController.dispose();
     _addressController.dispose();
   }
@@ -275,9 +258,9 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     if (value.matchAsPrefix(RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').toString()) != null) {
       return 'Please enter a valid email';
     } else {
-      final fireStore = FirebaseFirestore.instance;
+      final firestore = FirebaseFirestore.instance;
 
-      FirebaseFirestore.instance.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
+      firestore.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
         if (querySnapshot.docs.isNotEmpty) {
           return 'Email already exists';
         }
@@ -303,7 +286,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     return null;
   }
 
-  void _setBirthday(DateTime date) {
+  void _setBirthday(DateTime? date) {
     setState(() {
       final formattedDate = date.toString().split(' ')[0].split('-');
       _birthdayController.text = '${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}';
@@ -316,70 +299,128 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
       key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          const Text(
+            'Email',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'Email',
+            hint: 'Enter your valid email',
             controller: _emailController,
             validator: _validateEmail,
-            icon: Icons.email_outlined,
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Password',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.password,
-            label: 'Password',
+            hint: 'Enter your password',
             controller: _passwordController,
             validator: _validatePassword,
-            icon: Icons.lock_outline,
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
           const Divider(height: 50),
+          const Text(
+            'First Name',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'First Name',
+            hint: 'Enter your first name',
             controller: _firstNameController,
             validator: (value) => _validateInfo(value, 'first name'),
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Last Name',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'Last Name',
+            hint: 'Enter your last name',
             controller: _lastNameController,
             validator: (value) => _validateInfo(value, 'last name'),
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Age',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.int,
-            label: 'Age',
+            hint: 'Enter your age',
             controller: _ageController,
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
             validator: (value) => _validateInfo(value, 'age'),
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Weight',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.double,
-            label: 'Weight',
-            hint: 'Enter your weight in lbs',
+            hint: 'in lbs (pounds)',
             controller: _weightController,
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
             validator: (value) => _validateInfo(value, 'weight'),
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Gender',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           DropdownButtonFormField(
             hint: const Text('Select Gender'),
             validator: (value) => _validateInfo(value, 'gender', message: 'Please select your gender'),
             decoration: InputDecoration(
               border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(28),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-              filled: true,
-              fillColor: Colors.purple.shade50,
+              contentPadding: const EdgeInsets.all(20),
             ),
             items: genderList.map((String value) {
               return DropdownMenuItem<String>(
@@ -390,13 +431,21 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
             onChanged: (String? value) => setState(() => _genderController.text = value!),
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Birthday',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'Birthday',
-            hint: 'Select your birthday',
+            hint: 'mm/dd/yyyy',
             suffixIcon: Icons.calendar_month_outlined,
             readOnly: true,
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
             controller: _birthdayController,
             validator: (value) => _validateInfo(value, 'birthday'),
             onTap: () => showDatePicker(
@@ -404,35 +453,99 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
               initialDate: DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
-            ).then((DateTime? date) => _setBirthday(date!)).catchError((err) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Something went wrong! Try again later."),
-                ))),
+            ).then((DateTime? date) {
+              if (date != null) {
+                _setBirthday(date);
+              }
+            }).catchError((err) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Something went wrong! Try again later."),
+              ));
+              return null;
+            }),
           ),
           const SizedBox(height: 20),
-          InputFormField(
-            type: FieldType.text,
-            label: 'Country',
-            controller: _countryController,
-            validator: (value) => _validateInfo(value, 'country'),
-            decoration: FieldDecoration.borderless,
+          const Text(
+            'City',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'City',
+            hint: 'Enter the city you live in',
             controller: _cityController,
             validator: (value) => _validateInfo(value, 'city'),
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
           const SizedBox(height: 20),
+          const Text(
+            'Address',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
           InputFormField(
             type: FieldType.text,
-            label: 'Address',
+            hint: 'Enter the address you live in',
             controller: _addressController,
             validator: (value) => _validateInfo(value, 'address'),
-            decoration: FieldDecoration.borderless,
+            decoration: FieldDecoration.outlined,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StatusAlertDialog extends StatefulWidget {
+  final Widget currentStatusIndicator;
+  final String currentStatusText;
+
+  const StatusAlertDialog({
+    super.key,
+    required this.currentStatusIndicator,
+    required this.currentStatusText,
+  });
+
+  @override
+  State<StatusAlertDialog> createState() => _StatusAlertDialogState();
+}
+
+class _StatusAlertDialogState extends State<StatusAlertDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AbsorbPointer(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: AlertDialog(
+          alignment: Alignment.center,
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                switchOutCurve: Curves.easeOut,
+                child: widget.currentStatusIndicator,
+              ),
+              const SizedBox(width: 20),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                switchOutCurve: Curves.easeOut,
+                child: Text(widget.currentStatusText),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/routes.dart';
+import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
 
 class LoginForm extends StatefulWidget {
@@ -13,6 +13,7 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _rememberMe = false;
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -34,6 +35,12 @@ class _LoginFormState extends State<LoginForm> {
     return null;
   }
 
+  void onChanged(bool? value) {
+    setState(() {
+      _rememberMe = value!;
+    });
+  }
+
   void _login() {
     if (_formKey.currentState!.validate()) {
       // Perform login action
@@ -43,64 +50,123 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
+      ),
       child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text(
-                  'HELLO AGAIN',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Login to Your Account',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeColor.primary,
                 ),
-                const SizedBox(height: 30),
-                InputFormField(
-                  type: FieldType.text,
-                  label: 'Email',
-                  controller: _emailController,
-                  validator: _validateEmail,
-                  icon: Icons.email_outlined,
-                  decoration: FieldDecoration.borderless,
+              ),
+              const Text(
+                'Make sure that you already have an account',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: ThemeColor.primary,
                 ),
-                const SizedBox(height: 20),
-                InputFormField(
-                  type: FieldType.password,
-                  label: 'Password',
-                  controller: _passwordController,
-                  validator: _validatePassword,
-                  icon: Icons.lock_outline,
-                  decoration: FieldDecoration.borderless,
+              ),
+              const SizedBox(height: 40),
+              const Text(
+                'Email',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeColor.primary,
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: FilledButton.tonal(
-                        onPressed: _login,
-                        child: const Text('Login'),
-                      ),
-                    ),
-                  ],
+              ),
+              const SizedBox(height: 10),
+              InputFormField(
+                type: FieldType.text,
+                hint: 'Enter your email',
+                controller: _emailController,
+                validator: _validateEmail,
+                icon: Icons.email_outlined,
+                decoration: FieldDecoration.outlined,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Password',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeColor.primary,
                 ),
-                const SizedBox(height: 30),
-                TextButton(
-                  onPressed: () {
-                    Routes.redirectTo(context, "/register");
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              const SizedBox(height: 10),
+              InputFormField(
+                type: FieldType.password,
+                hint: 'Enter your password',
+                controller: _passwordController,
+                validator: _validatePassword,
+                icon: Icons.lock_outline,
+                decoration: FieldDecoration.outlined,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Text('Don\'t have an account?', style: TextStyle(color: Colors.grey.shade800)),
-                      const SizedBox(width: 5),
-                      const Text('Register'),
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: onChanged,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        side: const BorderSide(color: ThemeColor.primary),
+                        activeColor: ThemeColor.primary,
+                      ),
+                      const Text(
+                        'Remember me',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: ThemeColor.primary,
+                        ),
+                      ),
                     ],
                   ),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 0),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: ThemeColor.primary,
+                      ),
+                    ),
+                    child: const Text('Forgot password?'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              ConstrainedBox(
+                constraints: const BoxConstraints.tightFor(width: double.infinity, height: 55),
+                child: OutlinedButton(
+                  onPressed: _login,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: ThemeColor.white,
+                    backgroundColor: ThemeColor.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  ),
+                  child: const Text('Login'),
                 ),
-              ],
-            ),
-          )),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
