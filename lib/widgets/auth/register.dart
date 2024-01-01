@@ -37,13 +37,13 @@ class _RegisterFormState extends State<RegisterForm> {
       Icons.error_outline,
       key: ValueKey(2),
       color: Colors.red,
-      size: 60,
+      size: 55,
     ),
     const Icon(
       Icons.check_circle_outline,
       key: ValueKey(3),
       color: Colors.green,
-      size: 60,
+      size: 55,
     ),
   ];
   final List<String> _statusText = <String>[
@@ -51,22 +51,10 @@ class _RegisterFormState extends State<RegisterForm> {
     'Something went wrong! Try again later.',
     'Registration successful!',
   ];
+  final OverlayPortalController _overlayPortalController = OverlayPortalController();
 
   late Widget _currentStatusIndicator;
   late String _currentStatusText;
-  late OverlayEntry _overlayAlertStatus;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _overlayAlertStatus = OverlayEntry(
-      builder: (context) => StatusAlertDialog(
-        currentStatusIndicator: _currentStatusIndicator,
-        currentStatusText: _currentStatusText,
-      ),
-    );
-  }
 
   void _register(context) {
     final currentState = userAthleteFormKey.currentState?._formKey.currentState;
@@ -86,37 +74,36 @@ class _RegisterFormState extends State<RegisterForm> {
         _currentStatusIndicator = _statusIndicator[0];
         _currentStatusText = _statusText[0];
       });
-      _setOverlayAlertStatus(true);
 
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: userInfo['email']!, password: userInfo['password']!).then((UserCredential user) {
+      _overlayPortalController.show();
+
+      FirebaseAuth.instance.createUserWithEmailAndPassword(email: userInfo['email']!, password: userInfo['password']!).then((UserCredential user) async {
         user.user?.updateDisplayName('${userInfo['firstName']} ${userInfo['lastName']}');
 
         Athlete.current = Athlete.fromJson(userInfo);
-        Athlete.current?.id = user.user?.uid;
+        Athlete.current?.userId = user.user?.uid;
+
+        await FirebaseFirestore.instance.collection('athletes').add(Athlete.current!.toJson());
 
         setState(() {
           _currentStatusText = _statusText[2];
           _currentStatusIndicator = _statusIndicator[2];
         });
-      }).catchError((err) {
+      }).onError((FirebaseAuthException error, _) {
         setState(() {
           _currentStatusIndicator = _statusIndicator[1];
 
-          if (err.code.contains('email-already-in-use')) {
+          if (error.code.contains('email-already-in-use')) {
             _currentStatusText = 'Email already exists';
           } else {
             _currentStatusText = _statusText[1];
           }
         });
-      }).whenComplete(() => Future.delayed(const Duration(seconds: 3), () => setState(() => _setOverlayAlertStatus(false))));
-    }
-  }
-
-  void _setOverlayAlertStatus(bool show) {
-    if (show) {
-      Overlay.of(context).insert(_overlayAlertStatus);
-    } else {
-      _overlayAlertStatus.remove();
+      }).whenComplete(() => Future.delayed(const Duration(seconds: 3), () {
+            if (mounted) {
+              _overlayPortalController.hide();
+            }
+          }));
     }
   }
 
@@ -166,6 +153,13 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: const Text('Register'),
               ),
             ),
+            OverlayPortal(
+              controller: _overlayPortalController,
+              overlayChildBuilder: (BuildContext context) => StatusAlertDialog(
+                currentStatusIndicator: _currentStatusIndicator,
+                currentStatusText: _currentStatusText,
+              ),
+            )
           ],
         ),
       ),
@@ -206,7 +200,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _genderController = TextEditingController(text: _RegisterFormState.userInfo['gender']);
     _ageController = TextEditingController(text: _RegisterFormState.userInfo['age']);
     _weightController = TextEditingController(text: _RegisterFormState.userInfo['weight']);
-    _birthdayController = TextEditingController(text: _RegisterFormState.userInfo['birthday'].toString());
+    _birthdayController = TextEditingController(text: _formatDate(_RegisterFormState.userInfo['birthday']));
     _cityController = TextEditingController(text: _RegisterFormState.userInfo['city']);
     _addressController = TextEditingController(text: _RegisterFormState.userInfo['address']);
 
@@ -215,21 +209,21 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _firstNameController.addListener(() => _RegisterFormState.userInfo['firstName'] = _firstNameController.text);
     _lastNameController.addListener(() => _RegisterFormState.userInfo['lastName'] = _lastNameController.text);
     _genderController.addListener(() => _RegisterFormState.userInfo['gender'] = _genderController.text);
-    _ageController.addListener(() {
-      if (_ageController.text.isEmpty) {
-        _RegisterFormState.userInfo['age'] = '';
-      } else if (int.tryParse(_ageController.text) == null) {
-        _RegisterFormState.userInfo['age'] = int.parse(_ageController.text);
+    _ageController.addListener(() => _RegisterFormState.userInfo['age'] = _ageController.text);
+    _weightController.addListener(() => _RegisterFormState.userInfo['weight'] = _weightController.text);
+    _birthdayController.addListener(() {
+      if (_RegisterFormState.userInfo['birthday'] is String) {
+        if (_birthdayController.text.isNotEmpty) {
+          final formattedDate = _birthdayController.text.split('/');
+
+          _RegisterFormState.userInfo['birthday'] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
+        }
+      } else if (_RegisterFormState.userInfo['birthday'] is DateTime) {
+        final formattedDate = _RegisterFormState.userInfo['birthday'].toString().split(' ')[0].split('-');
+
+        _birthdayController.text = '${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}';
       }
     });
-    _weightController.addListener(() {
-      if (_weightController.text.isEmpty) {
-        _RegisterFormState.userInfo['weight'] = '';
-      } else if (double.tryParse(_weightController.text) == null) {
-        _RegisterFormState.userInfo['weight'] = double.parse(_weightController.text);
-      }
-    });
-    _birthdayController.addListener(() => _RegisterFormState.userInfo['birthday'] = _birthdayController.text);
     _cityController.addListener(() => _RegisterFormState.userInfo['city'] = _cityController.text);
     _addressController.addListener(() => _RegisterFormState.userInfo['address'] = _addressController.text);
   }
@@ -255,12 +249,10 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
       return 'Please enter your email';
     }
 
-    if (value.matchAsPrefix(RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').toString()) != null) {
+    if (!RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
       return 'Please enter a valid email';
     } else {
-      final firestore = FirebaseFirestore.instance;
-
-      firestore.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
+      FirebaseFirestore.instance.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
         if (querySnapshot.docs.isNotEmpty) {
           return 'Email already exists';
         }
@@ -284,6 +276,16 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     }
 
     return null;
+  }
+
+  String _formatDate(Object date) {
+    if (date is DateTime) {
+      final formattedDate = date.toString().split(' ')[0].split('-');
+
+      return '${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}';
+    }
+
+    return date.toString();
   }
 
   void _setBirthday(DateTime? date) {
