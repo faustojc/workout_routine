@@ -129,6 +129,8 @@ class _MainAuthState extends State<MainAuth> {
                       position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(animation),
                       child: child,
                     ),
+                    switchInCurve: Curves.easeInOut,
+                    switchOutCurve: Curves.easeInOut,
                     child: _pages[_currentIndex],
                   ),
                 ],
