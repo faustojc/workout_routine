@@ -1,5 +1,5 @@
 class Athlete {
-  late String? id;
+  late String? userId;
   final String email;
   final String password;
   final String firstName;
@@ -14,7 +14,7 @@ class Athlete {
   final DateTime updatedAt;
 
   Athlete({
-    this.id,
+    this.userId,
     required this.email,
     required this.password,
     required this.firstName,
@@ -33,7 +33,7 @@ class Athlete {
 
   factory Athlete.fromJson(Map<String, dynamic> json) {
     return Athlete(
-        id: json['id'],
+        userId: json['userId'],
         email: json['email'],
         password: json['password'],
         firstName: json['firstName'],
@@ -49,7 +49,7 @@ class Athlete {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'userId': userId,
         'email': email,
         'password': password,
         'firstName': firstName,
