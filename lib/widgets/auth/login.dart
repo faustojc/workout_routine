@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
+import 'package:workout_routine/widgets/components/toast.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -9,18 +12,20 @@ class LoginForm extends StatefulWidget {
   State<LoginForm> createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _rememberMe = false;
+  bool _isLoading = false;
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
 
-    if (value.matchAsPrefix(RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').toString()) != null) {
+    if (!RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
       return 'Please enter a valid email';
     }
 
@@ -41,9 +46,20 @@ class _LoginFormState extends State<LoginForm> {
     });
   }
 
-  void _login() {
+  void _login(context) {
     if (_formKey.currentState!.validate()) {
       // Perform login action
+      setState(() => _isLoading = true);
+
+      FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text).then((value) {
+        Routes.to(context, '/dashboard');
+      }).onError((FirebaseAuthException error, _) {
+        if (error.code.contains('invalid-credential')) {
+          showToast(context: context, message: 'Incorrect email or password!', type: ToastType.error, vsync: this);
+        }
+      }).whenComplete(() {
+        setState(() => _isLoading = false);
+      });
     }
   }
 
@@ -154,13 +170,13 @@ class _LoginFormState extends State<LoginForm> {
               ConstrainedBox(
                 constraints: const BoxConstraints.tightFor(width: double.infinity, height: 55),
                 child: OutlinedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : () => _login(context),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: ThemeColor.white,
                     backgroundColor: ThemeColor.primary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   ),
-                  child: const Text('Login'),
+                  child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
                 ),
               ),
             ],
