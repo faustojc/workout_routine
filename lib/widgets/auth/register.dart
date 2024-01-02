@@ -251,13 +251,13 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
 
     if (!RegExp(r'^[\w-]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
       return 'Please enter a valid email';
-    } else {
-      FirebaseFirestore.instance.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
-        if (querySnapshot.docs.isNotEmpty) {
-          return 'Email already exists';
-        }
-      });
     }
+
+    FirebaseFirestore.instance.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        return 'Email already exists';
+      }
+    });
 
     return null;
   }
