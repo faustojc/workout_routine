@@ -6,4 +6,5 @@ class ThemeColor {
   static const Color tertiary = Color(0xFF9DB2BF);
   static const Color accent = Color(0xFFDDE6ED);
   static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF0A1415);
 }
