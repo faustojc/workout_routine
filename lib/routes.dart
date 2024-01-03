@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/widgets/auth/login.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
-import 'package:workout_routine/widgets/auth/register.dart';
 import 'package:workout_routine/widgets/dashboard.dart';
 
 class Routes {
@@ -9,8 +7,6 @@ class Routes {
 
   // List of routes
   static final Map<String, WidgetBuilder> _routes = {
-    '/login': (_) => const LoginForm(),
-    '/register': (_) => const RegisterForm(),
     '/dashboard': (_) => const Dashboard(),
     '/auth': (_) => const MainAuth(),
   };
@@ -37,7 +33,20 @@ class Routes {
   }
 
   static void redirectTo(BuildContext context, String routeName) {
-    Navigator.of(context).pushReplacementNamed(routeName);
+    Route route = PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => _routes[routeName]!(context),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = const Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(position: animation.drive(tween), child: child);
+      },
+    );
+
+    Navigator.of(context).pushAndRemoveUntil(route, ModalRoute.withName(routeName));
   }
 
   static void back(BuildContext context) {
