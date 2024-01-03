@@ -52,14 +52,20 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       setState(() => _isLoading = true);
 
       FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text).then((value) {
-        Routes.to(context, '/dashboard');
+        Routes.redirectTo(context, '/dashboard');
       }).onError((FirebaseAuthException error, _) {
         if (error.code.contains('invalid-credential')) {
           showToast(context: context, message: 'Incorrect email or password!', type: ToastType.error, vsync: this);
+        } else if (error.code.contains('user-not-found')) {
+          showToast(context: context, message: 'User not found!', type: ToastType.error, vsync: this);
+        } else if (error.code.contains('wrong-password')) {
+          showToast(context: context, message: 'Incorrect password!', type: ToastType.error, vsync: this);
+        } else if (error.code.contains('network-request-failed')) {
+          showToast(context: context, message: 'Network error!', type: ToastType.error, vsync: this);
+        } else {
+          showToast(context: context, message: 'Something went wrong!', type: ToastType.error, vsync: this);
         }
-      }).whenComplete(() {
-        setState(() => _isLoading = false);
-      });
+      }).whenComplete(() => setState(() => _isLoading = false));
     }
   }
 
