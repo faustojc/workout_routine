@@ -9,6 +9,7 @@ class Athlete {
   final String address;
   final String age;
   final String weight;
+  final String height;
   final DateTime birthday;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -24,6 +25,7 @@ class Athlete {
     required this.address,
     required this.age,
     required this.weight,
+    required this.height,
     required this.birthday,
     required this.createdAt,
     required this.updatedAt,
@@ -33,19 +35,21 @@ class Athlete {
 
   factory Athlete.fromJson(Map<String, dynamic> json) {
     return Athlete(
-        userId: json['userId'],
-        email: json['email'],
-        password: json['password'],
-        firstName: json['firstName'],
-        lastName: json['lastName'],
-        gender: json['gender'],
-        city: json['city'],
-        address: json['address'],
-        age: json['age'],
-        weight: json['weight'],
-        birthday: json['birthday'],
-        createdAt: json['createdAt'],
-        updatedAt: json['updatedAt']);
+      userId: json['userId'],
+      email: json['email'],
+      password: json['password'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      gender: json['gender'],
+      city: json['city'],
+      address: json['address'],
+      age: json['age'],
+      weight: json['weight'],
+      height: json['height'],
+      birthday: json['birthday'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +63,7 @@ class Athlete {
         'address': address,
         'age': age,
         'weight': weight,
+        'height': height,
         'birthdate': birthday,
         'createdAt': createdAt,
         'updatedAt': updatedAt,

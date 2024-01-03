@@ -23,6 +23,7 @@ class _RegisterFormState extends State<RegisterForm> {
     'gender': '',
     'age': '',
     'weight': '',
+    'height': '',
     'birthday': '',
     'city': '',
     'address': '',
@@ -185,6 +186,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
   late TextEditingController _genderController;
   late TextEditingController _ageController;
   late TextEditingController _weightController;
+  late TextEditingController _heightController;
   late TextEditingController _birthdayController;
   late TextEditingController _cityController;
   late TextEditingController _addressController;
@@ -200,6 +202,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _genderController = TextEditingController(text: _RegisterFormState.userInfo['gender']);
     _ageController = TextEditingController(text: _RegisterFormState.userInfo['age']);
     _weightController = TextEditingController(text: _RegisterFormState.userInfo['weight']);
+    _heightController = TextEditingController(text: _RegisterFormState.userInfo['height']);
     _birthdayController = TextEditingController(text: _formatDate(_RegisterFormState.userInfo['birthday']));
     _cityController = TextEditingController(text: _RegisterFormState.userInfo['city']);
     _addressController = TextEditingController(text: _RegisterFormState.userInfo['address']);
@@ -211,6 +214,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _genderController.addListener(() => _RegisterFormState.userInfo['gender'] = _genderController.text);
     _ageController.addListener(() => _RegisterFormState.userInfo['age'] = _ageController.text);
     _weightController.addListener(() => _RegisterFormState.userInfo['weight'] = _weightController.text);
+    _heightController.addListener(() => _RegisterFormState.userInfo['height'] = _heightController.text);
     _birthdayController.addListener(() {
       if (_RegisterFormState.userInfo['birthday'] is String) {
         if (_birthdayController.text.isNotEmpty) {
@@ -239,6 +243,7 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _genderController.dispose();
     _ageController.dispose();
     _weightController.dispose();
+    _heightController.dispose();
     _birthdayController.dispose();
     _cityController.dispose();
     _addressController.dispose();
@@ -404,6 +409,23 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
             controller: _weightController,
             decoration: FieldDecoration.outlined,
             validator: (value) => _validateInfo(value, 'weight'),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Height',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: ThemeColor.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          InputFormField(
+            type: FieldType.double,
+            hint: 'in inches',
+            controller: _heightController,
+            decoration: FieldDecoration.outlined,
+            validator: (value) => _validateInfo(value, 'height'),
           ),
           const SizedBox(height: 20),
           const Text(
