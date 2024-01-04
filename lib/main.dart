@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
+import 'package:workout_routine/widgets/dashboard.dart';
 
 import 'firebase_options.dart';
 
@@ -21,35 +22,35 @@ class MainApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    print("Routes: ${Navigator.of(context)}");
-
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) {
-        if (didPop) {
-          return;
-        }
-
-        final navigator = Navigator.of(context);
-
-        if (navigator.canPop()) {
-          navigator.popUntil(ModalRoute.withName("/dashboard"));
-        } else {
-          SystemNavigator.pop();
-        }
-      },
-      child: MaterialApp(
-        title: 'Workout Routine',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
-          fontFamily: 'SpaceGrotesk',
-          useMaterial3: true,
-        ),
-        home: const MainAuth(),
-        initialRoute: FirebaseAuth.instance.currentUser != null ? '/dashboard' : '/auth',
-        onGenerateRoute: Routes.generateRoute,
-        debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'Workout Routine',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
+        fontFamily: 'SpaceGrotesk',
+        useMaterial3: true,
       ),
+      home: Builder(
+        builder: (context) => PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (didPop) {
+              return;
+            }
+
+            final navigator = Navigator.of(context);
+
+            if (navigator.canPop()) {
+              navigator.popUntil(ModalRoute.withName("/dashboard"));
+            } else {
+              SystemNavigator.pop();
+            }
+          },
+          child: FirebaseAuth.instance.currentUser != null ? const Dashboard() : const MainAuth(),
+        ),
+      ),
+      initialRoute: FirebaseAuth.instance.currentUser != null ? '/dashboard' : '/auth',
+      onGenerateRoute: Routes.generateRoute,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
