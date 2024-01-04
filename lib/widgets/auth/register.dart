@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
 
@@ -56,6 +57,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   late Widget _currentStatusIndicator;
   late String _currentStatusText;
+  bool _hasError = false;
 
   void _register(context) {
     final currentState = userAthleteFormKey.currentState?._formKey.currentState;
@@ -89,10 +91,12 @@ class _RegisterFormState extends State<RegisterForm> {
         setState(() {
           _currentStatusText = _statusText[2];
           _currentStatusIndicator = _statusIndicator[2];
+          _hasError = false;
         });
       }).onError((FirebaseAuthException error, _) {
         setState(() {
           _currentStatusIndicator = _statusIndicator[1];
+          _hasError = true;
 
           if (error.code.contains('email-already-in-use')) {
             _currentStatusText = 'Email already exists';
@@ -103,6 +107,10 @@ class _RegisterFormState extends State<RegisterForm> {
       }).whenComplete(() => Future.delayed(const Duration(seconds: 3), () {
             if (mounted) {
               _overlayPortalController.hide();
+
+              if (!_hasError) {
+                Routes.redirectTo(context, '/dashboard');
+              }
             }
           }));
     }
