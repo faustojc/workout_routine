@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
-import 'package:workout_routine/widgets/dashboard.dart';
+import 'package:workout_routine/widgets/dashboard/user/dashboard.dart';
 
 class Routes {
   static String get initialRoute => '/auth';
