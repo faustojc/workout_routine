@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
-import 'package:workout_routine/widgets/dashboard.dart';
+import 'package:workout_routine/widgets/dashboard/user/dashboard.dart';
 
 import 'firebase_options.dart';
 
