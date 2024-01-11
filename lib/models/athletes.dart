@@ -13,9 +13,9 @@ class Athlete {
   final String weight;
   final String height;
   final bool isSubscribed;
-  final DateTime birthday;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final Timestamp birthday;
+  final Timestamp createdAt;
+  final Timestamp updatedAt;
 
   Athlete({
     this.userId,
