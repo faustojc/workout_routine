@@ -51,8 +51,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       // Perform login action
       setState(() => _isLoading = true);
 
-      FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text).then((value) {
-        Routes.redirectTo(context, '/dashboard');
+      FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text).then((userCredential) {
+        Routes.redirectTo(context, '/');
       }).onError((FirebaseAuthException error, _) {
         if (error.code.contains('invalid-credential')) {
           showToast(context: context, message: 'Incorrect email or password!', type: ToastType.error, vsync: this);

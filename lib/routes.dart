@@ -7,7 +7,7 @@ class Routes {
 
   // List of routes
   static final Map<String, WidgetBuilder> _routes = {
-    '/dashboard': (_) => const Dashboard(),
+    '/': (_) => const Dashboard(),
     '/auth': (_) => const MainAuth(),
   };
 
@@ -46,7 +46,7 @@ class Routes {
       },
     );
 
-    Navigator.of(context).pushAndRemoveUntil(route, ModalRoute.withName(routeName));
+    Navigator.of(context).pushAndRemoveUntil(route, (route) => route.isCurrent && route.settings.name == routeName);
   }
 
   static void back(BuildContext context) {
