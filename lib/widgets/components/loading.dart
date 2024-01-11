@@ -17,7 +17,8 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1000),
+      lowerBound: 0.5,
       vsync: this,
     )..repeat(reverse: true);
 
@@ -41,12 +42,12 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           ),
         ),
         child: Center(
-          child: ScaleTransition(
-            scale: _animation,
+          child: FadeTransition(
+            opacity: _animation,
             child: Image.asset(
               'assets/images/icons/logo-white.png',
-              width: 200,
-              height: 200,
+              width: 300,
+              height: 300,
             ),
           ),
         ),
