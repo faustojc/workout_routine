@@ -1,5 +1,4 @@
 class Subscription {
-  final String id;
   final String athleteId;
   final String description;
   final String price;
@@ -7,7 +6,6 @@ class Subscription {
   final String type;
 
   Subscription({
-    required this.id,
     required this.athleteId,
     required this.description,
     required this.price,
@@ -17,7 +15,6 @@ class Subscription {
 
   factory Subscription.fromJson(Map<String, dynamic> json) {
     return Subscription(
-      id: json['id'],
       athleteId: json['athleteId'],
       description: json['description'],
       price: json['price'],
@@ -27,7 +24,6 @@ class Subscription {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
         'athleteId': athleteId,
         'description': description,
         'price': price,
