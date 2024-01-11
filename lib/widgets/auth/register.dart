@@ -28,8 +28,8 @@ class _RegisterFormState extends State<RegisterForm> {
     'birthday': '',
     'city': '',
     'address': '',
-    'createdAt': DateTime.now(),
-    'updatedAt': DateTime.now(),
+    'createdAt': Timestamp.now(),
+    'updatedAt': Timestamp.now(),
   };
 
   final userAthleteFormKey = GlobalKey<_UserAthleteFormState>();
