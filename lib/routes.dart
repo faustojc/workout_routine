@@ -3,8 +3,6 @@ import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/dashboard/user/dashboard.dart';
 
 class Routes {
-  static String get initialRoute => '/auth';
-
   // List of routes
   static final Map<String, WidgetBuilder> _routes = {
     '/': (_) => const Dashboard(),
