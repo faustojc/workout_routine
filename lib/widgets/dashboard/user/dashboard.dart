@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
+import 'package:workout_routine/widgets/components/loading.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -13,100 +14,228 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user != null) {
-        FirebaseFirestore.instance.collection('athletes').where('userId', isEqualTo: user.uid).get().then((QuerySnapshot<Map<String, dynamic>> querySnapshot) {
-          if (querySnapshot.docs.isNotEmpty) {
-            Athlete.current = Athlete.fromFireStore(querySnapshot);
-          }
-        });
-      }
+      FirebaseFirestore.instance.collection('athletes').where('userId', isEqualTo: user!.uid).get().then((QuerySnapshot<Map<String, dynamic>> querySnapshot) {
+        if (querySnapshot.docs.isNotEmpty) {
+          Athlete.current = Athlete.fromFireStore(querySnapshot);
+        }
+      }).whenComplete(() => setState(() => isLoading = false));
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Loading();
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        backgroundColor: ThemeColor.primary,
+        foregroundColor: ThemeColor.white,
+        elevation: 0,
+      ),
       drawer: Drawer(
-        child: Padding(
-          padding: const EdgeInsets.all(25),
-          child: ListView(
-            children: [
-              DrawerHeader(
-                padding: const EdgeInsets.all(30),
-                decoration: const BoxDecoration(color: ThemeColor.primary),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconButton(onPressed: () => Routes.back(context), icon: const Icon(Icons.close)),
-                    const SizedBox(height: 20),
-                    Container(
-                      decoration: const BoxDecoration(
-                        border: Border.fromBorderSide(BorderSide(color: Colors.transparent)),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Text(
-                        Athlete.current!.firstName.characters.first + Athlete.current!.lastName.characters.first,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      Athlete.current!.firstName,
+        backgroundColor: ThemeColor.primary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Close button
+            Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top - 10),
+              child: IconButton(
+                onPressed: () => Routes.back(context),
+                icon: const Icon(
+                  Icons.close,
+                  color: ThemeColor.white,
+                ),
+              ),
+            ),
+            // Drawer Header
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: ThemeColor.white,
+                    radius: 40,
+                    child: Text(
+                      Athlete.current!.firstName.characters.first + Athlete.current!.lastName.characters.first,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                        color: ThemeColor.secondary,
+                        fontSize: 40,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      Athlete.current!.email,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${Athlete.current!.firstName} ${Athlete.current!.lastName}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(26)),
-                        color: Athlete.current!.isSubscribed ? Colors.green : Colors.grey.shade600,
-                      ),
-                      child: Text(
-                        Athlete.current!.isSubscribed ? 'Subscribed' : 'Not Subscribed',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    )
+                  ),
+                  Text(
+                    Athlete.current!.email,
+                    style: const TextStyle(
+                      color: ThemeColor.tertiary,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(26)),
+                      color: Athlete.current!.isSubscribed ? Colors.green : Colors.grey.shade600,
+                    ),
+                    child: Text(
+                      Athlete.current!.isSubscribed ? 'Subscribed' : 'Not Subscribed',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            // Body
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                color: ThemeColor.tertiary,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: const Text('Profile'),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.notifications),
+                      title: const Text('Notifications'),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.info),
+                      title: const Text('Terms & Conditions'),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: const Text('Logout'),
+                      onTap: () {},
+                    ),
                   ],
                 ),
               ),
-              ListTile(leading: const Icon(Icons.logout), title: const Text('Logout'), onTap: () {}),
-            ],
-          ),
+            ),
+            // Footer
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Text(
+                '© 2024 Fausto John Claire Boko &  Cherry Angela Rodriguez. All Rights Reserved.',
+                textScaler: TextScaler.linear(0.8),
+                style: TextStyle(
+                  color: ThemeColor.tertiary,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [ThemeColor.primary, ThemeColor.secondary],
+            colors: [ThemeColor.primary, ThemeColor.tertiary],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        child: const CustomScrollView(
+        child: CustomScrollView(
           slivers: [
-            Text('Dashboard'),
+            SliverFillRemaining(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome! ${Athlete.current!.firstName}',
+                      style: const TextStyle(
+                        color: ThemeColor.tertiary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: ThemeColor.white,
+                      ),
+                      child: Text(
+                        Athlete.current!.firstName.characters.first + Athlete.current!.lastName.characters.first,
+                        style: const TextStyle(
+                          color: ThemeColor.secondary,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Personal Record',
+                            style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.add, size: 15),
+                            label: const Text(
+                              'Add',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: ThemeColor.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              side: const BorderSide(color: ThemeColor.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
