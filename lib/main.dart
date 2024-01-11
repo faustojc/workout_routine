@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
-import 'package:workout_routine/widgets/auth/main_auth.dart';
-import 'package:workout_routine/widgets/dashboard/user/dashboard.dart';
 
 import 'firebase_options.dart';
 
@@ -29,26 +26,7 @@ class MainApp extends StatelessWidget {
         fontFamily: 'SpaceGrotesk',
         useMaterial3: true,
       ),
-      home: Builder(
-        builder: (context) => PopScope(
-          canPop: false,
-          onPopInvoked: (didPop) {
-            if (didPop) {
-              return;
-            }
-
-            final navigator = Navigator.of(context);
-
-            if (navigator.canPop()) {
-              navigator.popUntil(ModalRoute.withName("/dashboard"));
-            } else {
-              SystemNavigator.pop();
-            }
-          },
-          child: FirebaseAuth.instance.currentUser != null ? const Dashboard() : const MainAuth(),
-        ),
-      ),
-      initialRoute: FirebaseAuth.instance.currentUser != null ? '/dashboard' : '/auth',
+      initialRoute: FirebaseAuth.instance.currentUser != null ? '/' : '/auth',
       onGenerateRoute: Routes.generateRoute,
       debugShowCheckedModeBanner: false,
     );
