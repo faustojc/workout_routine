@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
@@ -16,22 +17,6 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  static final Map<String, dynamic> userInfo = {
-    'email': '',
-    'password': '',
-    'firstName': '',
-    'lastName': '',
-    'gender': '',
-    'age': '',
-    'weight': '',
-    'height': '',
-    'birthday': '',
-    'city': '',
-    'address': '',
-    'createdAt': Timestamp.now(),
-    'updatedAt': Timestamp.now(),
-  };
-
   final userAthleteFormKey = GlobalKey<_UserAthleteFormState>();
   final List<Widget> _statusIndicator = <Widget>[
     const CircularProgressIndicator(key: ValueKey(1)),
@@ -63,11 +48,11 @@ class _RegisterFormState extends State<RegisterForm> {
     final currentState = userAthleteFormKey.currentState?._formKey.currentState;
 
     if (currentState != null && currentState.validate()) {
-      userInfo.map((key, value) {
+      athleteInfo.map((key, value) {
         if (key == 'birthday' && value != null && value is String) {
           final formattedDate = value.toString().split(' ')[0].split('/');
 
-          userInfo[key] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
+          athleteInfo[key] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
         }
 
         return MapEntry(key, value);
@@ -80,10 +65,10 @@ class _RegisterFormState extends State<RegisterForm> {
 
       _overlayPortalController.show();
 
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: userInfo['email']!, password: userInfo['password']!).then((UserCredential user) async {
-        user.user?.updateDisplayName('${userInfo['firstName']} ${userInfo['lastName']}');
+      FirebaseAuth.instance.createUserWithEmailAndPassword(email: athleteInfo['email']!, password: athleteInfo['password']!).then((UserCredential user) async {
+        user.user?.updateDisplayName('${athleteInfo['firstName']} ${athleteInfo['lastName']}');
 
-        Athlete.current = Athlete.fromJson(userInfo);
+        Athlete.current = Athlete.fromJson(athleteInfo);
         Athlete.current?.userId = user.user?.uid;
 
         await FirebaseFirestore.instance.collection('athletes').add(Athlete.current!.toJson());
@@ -203,41 +188,41 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
   void initState() {
     super.initState();
 
-    _emailController = TextEditingController(text: _RegisterFormState.userInfo['email']);
-    _passwordController = TextEditingController(text: _RegisterFormState.userInfo['password']);
-    _firstNameController = TextEditingController(text: _RegisterFormState.userInfo['firstName']);
-    _lastNameController = TextEditingController(text: _RegisterFormState.userInfo['lastName']);
-    _genderController = TextEditingController(text: _RegisterFormState.userInfo['gender']);
-    _ageController = TextEditingController(text: _RegisterFormState.userInfo['age']);
-    _weightController = TextEditingController(text: _RegisterFormState.userInfo['weight']);
-    _heightController = TextEditingController(text: _RegisterFormState.userInfo['height']);
-    _birthdayController = TextEditingController(text: _formatDate(_RegisterFormState.userInfo['birthday']));
-    _cityController = TextEditingController(text: _RegisterFormState.userInfo['city']);
-    _addressController = TextEditingController(text: _RegisterFormState.userInfo['address']);
+    _emailController = TextEditingController(text: athleteInfo['email']);
+    _passwordController = TextEditingController(text: athleteInfo['password']);
+    _firstNameController = TextEditingController(text: athleteInfo['firstName']);
+    _lastNameController = TextEditingController(text: athleteInfo['lastName']);
+    _genderController = TextEditingController(text: athleteInfo['gender']);
+    _ageController = TextEditingController(text: athleteInfo['age']);
+    _weightController = TextEditingController(text: athleteInfo['weight']);
+    _heightController = TextEditingController(text: athleteInfo['height']);
+    _birthdayController = TextEditingController(text: _formatDate(athleteInfo['birthday']));
+    _cityController = TextEditingController(text: athleteInfo['city']);
+    _addressController = TextEditingController(text: athleteInfo['address']);
 
-    _emailController.addListener(() => _RegisterFormState.userInfo['email'] = _emailController.text);
-    _passwordController.addListener(() => _RegisterFormState.userInfo['password'] = _passwordController.text);
-    _firstNameController.addListener(() => _RegisterFormState.userInfo['firstName'] = _firstNameController.text);
-    _lastNameController.addListener(() => _RegisterFormState.userInfo['lastName'] = _lastNameController.text);
-    _genderController.addListener(() => _RegisterFormState.userInfo['gender'] = _genderController.text);
-    _ageController.addListener(() => _RegisterFormState.userInfo['age'] = _ageController.text);
-    _weightController.addListener(() => _RegisterFormState.userInfo['weight'] = _weightController.text);
-    _heightController.addListener(() => _RegisterFormState.userInfo['height'] = _heightController.text);
+    _emailController.addListener(() => athleteInfo['email'] = _emailController.text);
+    _passwordController.addListener(() => athleteInfo['password'] = _passwordController.text);
+    _firstNameController.addListener(() => athleteInfo['firstName'] = _firstNameController.text);
+    _lastNameController.addListener(() => athleteInfo['lastName'] = _lastNameController.text);
+    _genderController.addListener(() => athleteInfo['gender'] = _genderController.text);
+    _ageController.addListener(() => athleteInfo['age'] = _ageController.text);
+    _weightController.addListener(() => athleteInfo['weight'] = _weightController.text);
+    _heightController.addListener(() => athleteInfo['height'] = _heightController.text);
     _birthdayController.addListener(() {
-      if (_RegisterFormState.userInfo['birthday'] is String) {
+      if (athleteInfo['birthday'] is String) {
         if (_birthdayController.text.isNotEmpty) {
           final formattedDate = _birthdayController.text.split('/');
 
-          _RegisterFormState.userInfo['birthday'] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
+          athleteInfo['birthday'] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
         }
-      } else if (_RegisterFormState.userInfo['birthday'] is DateTime) {
-        final formattedDate = _RegisterFormState.userInfo['birthday'].toString().split(' ')[0].split('-');
+      } else if (athleteInfo['birthday'] is DateTime) {
+        final formattedDate = athleteInfo['birthday'].toString().split(' ')[0].split('-');
 
         _birthdayController.text = '${formattedDate[1]}/${formattedDate[2]}/${formattedDate[0]}';
       }
     });
-    _cityController.addListener(() => _RegisterFormState.userInfo['city'] = _cityController.text);
-    _addressController.addListener(() => _RegisterFormState.userInfo['address'] = _addressController.text);
+    _cityController.addListener(() => athleteInfo['city'] = _cityController.text);
+    _addressController.addListener(() => athleteInfo['address'] = _addressController.text);
   }
 
   @override
