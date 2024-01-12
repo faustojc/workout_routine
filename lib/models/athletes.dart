@@ -37,7 +37,7 @@ class Athlete {
 
   static Athlete? current;
 
-  factory Athlete.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
+  factory Athlete.fromFirestoreDocument(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
     final data = snapshot.data();
 
     return Athlete(
@@ -59,7 +59,7 @@ class Athlete {
     );
   }
 
-  factory Athlete.fromFireStore(QuerySnapshot<Map<String, dynamic>> snapshot) {
+  factory Athlete.fromFirestoreQuery(QuerySnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.docs.first.data();
 
     return Athlete(
