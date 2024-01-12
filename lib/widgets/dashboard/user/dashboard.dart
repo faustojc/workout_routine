@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/personal_record.dart';
+import 'package:workout_routine/models/subscription.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/loading.dart';
+import 'package:workout_routine/widgets/components/pr_carousel.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -17,11 +20,15 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   late Future<Athlete?> _fetchAthleteData;
+  late Future<Subscription?> _fetchSubscription;
+  late Future<List<PersonalRecord>?> _fetchPR;
 
   @override
   void initState() {
     super.initState();
     _fetchAthleteData = _getAthleteData();
+    _fetchSubscription = _getSubscriptionData();
+    _fetchPR = _getPRData();
   }
 
   Future<Athlete?> _getAthleteData() async {
@@ -29,22 +36,53 @@ class _DashboardState extends State<Dashboard> {
 
     if (user != null) {
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('athletes').where('userId', isEqualTo: user.uid).get();
+
       if (querySnapshot.docs.isNotEmpty) {
-        return Athlete.fromFireStore(querySnapshot);
+        return Athlete.fromFirestoreQuery(querySnapshot);
       }
     }
+    return null;
+  }
+
+  Future<Subscription?> _getSubscriptionData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('subscriptions').where('userId', isEqualTo: user.uid).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return Subscription.fromFirestoreQuery(querySnapshot);
+      }
+    }
+
+    return null;
+  }
+
+  Future<List<PersonalRecord>?> _getPRData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('personal_records').where('userId', isEqualTo: user.uid).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return PersonalRecord.fromFirestoreQuery(querySnapshot, null);
+      }
+    }
+
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _fetchAthleteData,
-        builder: (BuildContext context, AsyncSnapshot<Athlete?> snapshot) {
+        future: Future.wait([_fetchAthleteData, _fetchSubscription, _fetchPR]),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Loading();
           } else {
-            Athlete.current = snapshot.data;
+            Athlete.current = snapshot.data?.firstWhere((data) => data is Athlete);
+            Subscription.current = snapshot.data?.firstWhere((data) => data is Subscription);
+            PersonalRecord.current = snapshot.data?.firstWhere((data) => data is List<PersonalRecord>);
 
             return Scaffold(
               resizeToAvoidBottomInset: true,
@@ -258,6 +296,7 @@ class _DashboardState extends State<Dashboard> {
                                 ],
                               ),
                             ),
+                            const PRCarousel(),
                           ],
                         ),
                       ),
