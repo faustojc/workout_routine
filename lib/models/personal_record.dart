@@ -4,7 +4,6 @@ class PersonalRecord {
   final String userId;
   final String title;
   final double weight;
-  final double oldWeight;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -12,7 +11,6 @@ class PersonalRecord {
     required this.userId,
     required this.title,
     required this.weight,
-    required this.oldWeight,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -26,7 +24,6 @@ class PersonalRecord {
       userId: data?['userId'],
       title: data?['title'],
       weight: data?['weight'],
-      oldWeight: data?['oldWeight'],
       createdAt: data?['createdAt'],
       updatedAt: data?['updatedAt'],
     );
