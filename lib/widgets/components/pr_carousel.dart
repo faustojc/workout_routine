@@ -86,12 +86,9 @@ class _PRCarouselState extends State<PRCarousel> {
       itemCount: PersonalRecord.current.length,
       onPageChanged: (int pagePosition) => setState(() => activePage = pagePosition),
       itemBuilder: (BuildContext context, int pagePosition) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          decoration: BoxDecoration(
-            color: ThemeColor.white,
-            borderRadius: BorderRadius.circular(14),
-          ),
+        return Card(
+          elevation: 2,
+          color: ThemeColor.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +104,10 @@ class _PRCarouselState extends State<PRCarousel> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('PR in lbs'),
+                  const Text(
+                    'PR in lbs',
+                    style: TextStyle(fontSize: 12, color: ThemeColor.tertiary),
+                  ),
                   IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
                 ],
               ),
@@ -132,7 +132,7 @@ class _PRCarouselState extends State<PRCarousel> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${PersonalRecord.current[pagePosition]!.oldWeight} lbs',
+                        '${PersonalRecord.current[pagePosition]!.weight} lbs',
                         style: const TextStyle(
                           color: ThemeColor.tertiary,
                           fontWeight: FontWeight.w500,
