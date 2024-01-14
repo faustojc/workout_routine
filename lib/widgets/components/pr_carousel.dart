@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/models/personal_record.dart';
 import 'package:workout_routine/themes/colors.dart';
@@ -66,8 +65,7 @@ class _PRCarouselState extends State<PRCarousel> {
         ),
       ));
 
-  String _dateToString(Timestamp timestamp) {
-    final date = timestamp.toDate();
+  String _dateToString(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     final year = date.year.toString().padLeft(4, '0');
@@ -77,84 +75,116 @@ class _PRCarouselState extends State<PRCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    if (PersonalRecord.current.isEmpty) {
+    if (PersonalRecordModel.list.isEmpty) {
       return _emptyPR();
     }
 
     return PageView.builder(
       controller: _pageController,
-      itemCount: PersonalRecord.current.length,
-      onPageChanged: (int pagePosition) => setState(() => activePage = pagePosition),
-      itemBuilder: (BuildContext context, int pagePosition) {
-        return Card(
-          elevation: 2,
-          color: ThemeColor.white,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                PersonalRecord.current[pagePosition]!.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: ThemeColor.black,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'PR in lbs',
-                    style: TextStyle(fontSize: 12, color: ThemeColor.tertiary),
-                  ),
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-                ],
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                'PR History',
-                style: TextStyle(
-                  color: ThemeColor.black,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 24,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                  border: Border.fromBorderSide(BorderSide(color: ThemeColor.tertiary)),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${PersonalRecord.current[pagePosition]!.weight} lbs',
-                        style: const TextStyle(
-                          color: ThemeColor.tertiary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        'Date Entered ${_dateToString(PersonalRecord.current[pagePosition]!.createdAt)}',
-                        style: const TextStyle(
-                          color: ThemeColor.tertiary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+      itemCount: PersonalRecordModel.list.length,
+      itemBuilder: (context, int page) {
+        return _carousel(page);
       },
+    );
+  }
+
+  Widget _carousel(int currentPage) {
+    final record = PersonalRecordModel.list[currentPage];
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutQuint,
+      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      decoration: BoxDecoration(
+        color: ThemeColor.white,
+        borderRadius: BorderRadius.circular(20.0),
+        boxShadow: const [
+          BoxShadow(
+            color: ThemeColor.black,
+            blurRadius: 10.0,
+            spreadRadius: 0.0,
+            offset: Offset(0.0, 0.0),
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: ThemeColor.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: ThemeColor.black,
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              record!.title,
+              style: const TextStyle(
+                fontSize: 16,
+                color: ThemeColor.black,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'PR in lbs',
+                  style: TextStyle(fontSize: 12, color: ThemeColor.tertiary),
+                ),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+              ],
+            ),
+            const SizedBox(height: 15),
+            const Text(
+              'PR History',
+              style: TextStyle(
+                color: ThemeColor.black,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+                border: Border.fromBorderSide(BorderSide(color: ThemeColor.tertiary)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${record.weight} lbs',
+                      textScaler: const TextScaler.linear(0.7),
+                      style: const TextStyle(
+                        color: ThemeColor.tertiary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      'Date Entered ${_dateToString(record.createdAt)}',
+                      textScaler: const TextScaler.linear(0.7),
+                      style: const TextStyle(
+                        color: ThemeColor.tertiary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
