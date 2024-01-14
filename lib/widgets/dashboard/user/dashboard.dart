@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/models/personal_record.dart';
 import 'package:workout_routine/models/subscription.dart';
+import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/loading.dart';
@@ -19,54 +19,23 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  late Future<Athlete?> _fetchAthleteData;
-  late Future<Subscription?> _fetchSubscription;
-  late Future<List<PersonalRecord>?> _fetchPR;
+  late Future<Map<String, dynamic>?> _fetchUserData;
 
   @override
   void initState() {
     super.initState();
-    _fetchAthleteData = _getAthleteData();
-    _fetchSubscription = _getSubscriptionData();
-    _fetchPR = _getPRData();
+
+    user = session.user;
+
+    _fetchUserData = _getUserData();
   }
 
-  Future<Athlete?> _getAthleteData() async {
-    User? user = FirebaseAuth.instance.currentUser;
+  Future<Map<String, dynamic>?> _getUserData() async {
+    String email = user.email ?? '';
+    final data = await supabase.from('users').select('*, athletes(*), personal_records(*), subscriptions(*)').eq('email', email).single();
 
-    if (user != null) {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('athletes').where('userId', isEqualTo: user.uid).get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        return Athlete.fromFirestoreQuery(querySnapshot);
-      }
-    }
-    return null;
-  }
-
-  Future<Subscription?> _getSubscriptionData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('subscriptions').where('userId', isEqualTo: user.uid).get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        return Subscription.fromFirestoreQuery(querySnapshot);
-      }
-    }
-
-    return null;
-  }
-
-  Future<List<PersonalRecord>?> _getPRData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('personal_records').where('userId', isEqualTo: user.uid).get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        return PersonalRecord.fromFirestoreQuery(querySnapshot, null);
-      }
+    if (data.isNotEmpty) {
+      return data;
     }
 
     return null;
@@ -75,14 +44,15 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Future.wait([_fetchAthleteData, _fetchSubscription, _fetchPR]),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        future: _fetchUserData,
+        builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Loading();
           } else {
-            Athlete.current = snapshot.data?.firstWhere((data) => data is Athlete);
-            Subscription.current = snapshot.data?.firstWhere((data) => data is Subscription);
-            PersonalRecord.current = snapshot.data?.firstWhere((data) => data is List<PersonalRecord>);
+            UserModel.current = UserModel.fromJson(snapshot.data!);
+            AthleteModel.current = AthleteModel.fromJson(snapshot.data!['athletes'][0]);
+            PersonalRecordModel.list = PersonalRecordModel.fromJson(snapshot.data!['personal_records']);
+            SubscriptionModel.current = SubscriptionModel.fromJson(snapshot.data!['subscriptions'][0]);
 
             return Scaffold(
               resizeToAvoidBottomInset: true,
@@ -119,7 +89,7 @@ class _DashboardState extends State<Dashboard> {
                             backgroundColor: ThemeColor.white,
                             radius: 40,
                             child: Text(
-                              Athlete.current!.firstName.characters.first + Athlete.current!.lastName.characters.first,
+                              AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
                               style: const TextStyle(
                                 color: ThemeColor.secondary,
                                 fontSize: 40,
@@ -129,7 +99,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            '${Athlete.current!.firstName} ${Athlete.current!.lastName}',
+                            '${AthleteModel.current!.firstName} ${AthleteModel.current!.lastName}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -137,7 +107,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           Text(
-                            Athlete.current!.email,
+                            user.email.toString(),
                             style: const TextStyle(
                               color: ThemeColor.tertiary,
                               fontSize: 12,
@@ -148,10 +118,10 @@ class _DashboardState extends State<Dashboard> {
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(26)),
-                              color: Athlete.current!.isSubscribed ? Colors.green : Colors.grey.shade600,
+                              color: SubscriptionModel.current!.isSubscribed ? Colors.green : Colors.grey.shade600,
                             ),
                             child: Text(
-                              Athlete.current!.isSubscribed ? 'Subscribed' : 'Not Subscribed',
+                              SubscriptionModel.current!.isSubscribed ? 'Subscribed' : 'Not Subscribed',
                               style: const TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           )
@@ -238,67 +208,74 @@ class _DashboardState extends State<Dashboard> {
                 child: CustomScrollView(
                   slivers: [
                     SliverFillRemaining(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome! ${Athlete.current!.firstName}',
-                              style: const TextStyle(
-                                color: ThemeColor.tertiary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(20)),
-                                color: ThemeColor.white,
-                              ),
-                              child: Text(
-                                Athlete.current!.firstName.characters.first + Athlete.current!.lastName.characters.first,
-                                style: const TextStyle(
-                                  color: ThemeColor.secondary,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome! ${AthleteModel.current!.lastName}',
+                                  style: const TextStyle(
+                                    color: ThemeColor.tertiary,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'Personal Record',
-                                    style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.w500),
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                                    color: ThemeColor.white,
                                   ),
-                                  OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.add, size: 15),
-                                    label: const Text(
-                                      'Add',
-                                      style: TextStyle(fontSize: 12),
+                                  child: Text(
+                                    AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                                    style: const TextStyle(
+                                      color: ThemeColor.secondary,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: ThemeColor.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Personal Record',
+                                        style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      side: const BorderSide(color: ThemeColor.white),
-                                    ),
+                                      OutlinedButton.icon(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.add, size: 15),
+                                        label: const Text(
+                                          'Add',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: ThemeColor.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          side: const BorderSide(color: ThemeColor.white),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const PRCarousel(),
-                          ],
-                        ),
+                          ),
+                          const Expanded(
+                            child: PRCarousel(),
+                          ),
+                        ],
                       ),
                     ),
                   ],
