@@ -1,10 +1,11 @@
 import 'dart:ui';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/subscription.dart';
+import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
@@ -65,36 +66,37 @@ class _RegisterFormState extends State<RegisterForm> {
 
       _overlayPortalController.show();
 
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: athleteInfo['email']!, password: athleteInfo['password']!).then((UserCredential user) async {
-        user.user?.updateDisplayName('${athleteInfo['firstName']} ${athleteInfo['lastName']}');
+      supabase.auth.signUp(email: userInfo['email']!, password: userInfo['password']!).then((AuthResponse response) async {
+        session = response.session!;
+        user = response.user!;
 
-        Athlete.current = Athlete.fromJson(athleteInfo);
-        Athlete.current?.userId = user.user?.uid;
+        final userData = await supabase.from('users').insert(userInfo).single();
+        UserModel.current = UserModel.fromJson(userData);
+        athleteInfo['userId'] = UserModel.current?.id;
 
-        await FirebaseFirestore.instance.collection('athletes').add(Athlete.current!.toJson());
+        final athleteData = await supabase.from('athletes').insert(athleteInfo).single();
+        AthleteModel.current = AthleteModel.fromJson(athleteData);
+
+        final subData = await supabase.from('subscriptions').insert({'userId': userData['id']}).single();
+        SubscriptionModel.current = SubscriptionModel.fromJson(subData);
 
         setState(() {
-          _currentStatusText = _statusText[2];
+          _currentStatusText = 'Registration successful! Email confirmation was sent to ${userInfo['email']} to verify your account.';
           _currentStatusIndicator = _statusIndicator[2];
           _hasError = false;
         });
-      }).onError((FirebaseAuthException error, _) {
+      }).onError((error, stackTrace) {
         setState(() {
           _currentStatusIndicator = _statusIndicator[1];
           _hasError = true;
-
-          if (error.code.contains('email-already-in-use')) {
-            _currentStatusText = 'Email already exists';
-          } else {
-            _currentStatusText = _statusText[1];
-          }
+          _currentStatusText = _statusText[1];
         });
       }).whenComplete(() => Future.delayed(const Duration(seconds: 3), () {
             if (mounted) {
               _overlayPortalController.hide();
 
               if (!_hasError) {
-                Routes.redirectTo(context, '/dashboard');
+                Routes.redirectTo(context, '/');
               }
             }
           }));
@@ -188,8 +190,8 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
   void initState() {
     super.initState();
 
-    _emailController = TextEditingController(text: athleteInfo['email']);
-    _passwordController = TextEditingController(text: athleteInfo['password']);
+    _emailController = TextEditingController(text: userInfo['email']);
+    _passwordController = TextEditingController(text: userInfo['password']);
     _firstNameController = TextEditingController(text: athleteInfo['firstName']);
     _lastNameController = TextEditingController(text: athleteInfo['lastName']);
     _genderController = TextEditingController(text: athleteInfo['gender']);
@@ -200,21 +202,37 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
     _cityController = TextEditingController(text: athleteInfo['city']);
     _addressController = TextEditingController(text: athleteInfo['address']);
 
-    _emailController.addListener(() => athleteInfo['email'] = _emailController.text);
-    _passwordController.addListener(() => athleteInfo['password'] = _passwordController.text);
+    _emailController.addListener(() => userInfo['email'] = _emailController.text);
+    _passwordController.addListener(() => userInfo['password'] = _passwordController.text);
     _firstNameController.addListener(() => athleteInfo['firstName'] = _firstNameController.text);
     _lastNameController.addListener(() => athleteInfo['lastName'] = _lastNameController.text);
     _genderController.addListener(() => athleteInfo['gender'] = _genderController.text);
-    _ageController.addListener(() => athleteInfo['age'] = _ageController.text);
-    _weightController.addListener(() => athleteInfo['weight'] = _weightController.text);
-    _heightController.addListener(() => athleteInfo['height'] = _heightController.text);
+    _ageController.addListener(() {
+      if (athleteInfo['age'] is String && _ageController.text.isNotEmpty) {
+        athleteInfo['age'] = int.parse(_ageController.text);
+      } else if (athleteInfo['age'] is int) {
+        _ageController.text = athleteInfo['age'].toString();
+      }
+    });
+    _weightController.addListener(() {
+      if (athleteInfo['weight'] is String && _weightController.text.isNotEmpty) {
+        athleteInfo['weight'] = double.parse(_weightController.text);
+      } else if (athleteInfo['weight'] is double) {
+        _weightController.text = athleteInfo['weight'].toString();
+      }
+    });
+    _heightController.addListener(() {
+      if (athleteInfo['height'] is String && _heightController.text.isNotEmpty) {
+        athleteInfo['height'] = double.parse(_heightController.text);
+      } else if (athleteInfo['height'] is double) {
+        _heightController.text = athleteInfo['height'].toString();
+      }
+    });
     _birthdayController.addListener(() {
-      if (athleteInfo['birthday'] is String) {
-        if (_birthdayController.text.isNotEmpty) {
-          final formattedDate = _birthdayController.text.split('/');
+      if (athleteInfo['birthday'] is String && _birthdayController.text.isNotEmpty) {
+        final formattedDate = _birthdayController.text.split('/');
 
-          athleteInfo['birthday'] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
-        }
+        athleteInfo['birthday'] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
       } else if (athleteInfo['birthday'] is DateTime) {
         final formattedDate = athleteInfo['birthday'].toString().split(' ')[0].split('-');
 
@@ -251,10 +269,8 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
       return 'Please enter a valid email';
     }
 
-    FirebaseFirestore.instance.collection('athletes').where('email', isEqualTo: value).get().then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        return 'Email already exists';
-      }
+    supabase.from('athletes').select().eq('email', value).then((response) {
+      return response.map((data) => data.map((key, value) => MapEntry(key, value))).toList().isNotEmpty ? 'Email already exists' : null;
     });
 
     return null;

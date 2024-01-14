@@ -1,5 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:workout_routine/data/user.dart';
+import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
@@ -46,25 +48,21 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     });
   }
 
-  void _login(context) {
+  Future<void> _login(context) async {
     if (_formKey.currentState!.validate()) {
       // Perform login action
       setState(() => _isLoading = true);
 
-      FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text).then((userCredential) {
+      supabase.auth.signInWithPassword(email: _emailController.text.trim(), password: _passwordController.text.trim()).then((AuthResponse response) async {
+        session = response.session!;
+        user = response.user!;
+
+        final userData = await supabase.from('users').select().eq('email', _emailController.text.trim()).eq('password', _passwordController.text.trim()).single();
+        UserModel.current = UserModel.fromJson(userData);
+
         Routes.redirectTo(context, '/');
-      }).onError((FirebaseAuthException error, _) {
-        if (error.code.contains('invalid-credential')) {
-          showToast(context: context, message: 'Incorrect email or password!', type: ToastType.error, vsync: this);
-        } else if (error.code.contains('user-not-found')) {
-          showToast(context: context, message: 'User not found!', type: ToastType.error, vsync: this);
-        } else if (error.code.contains('wrong-password')) {
-          showToast(context: context, message: 'Incorrect password!', type: ToastType.error, vsync: this);
-        } else if (error.code.contains('network-request-failed')) {
-          showToast(context: context, message: 'Network error!', type: ToastType.error, vsync: this);
-        } else {
-          showToast(context: context, message: 'Something went wrong!', type: ToastType.error, vsync: this);
-        }
+      }).onError((error, stackTrace) {
+        showToast(context: context, message: error.toString(), type: ToastType.error, vsync: this);
       }).whenComplete(() => setState(() => _isLoading = false));
     }
   }
