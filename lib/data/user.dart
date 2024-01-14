@@ -1,9 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+late SupabaseClient supabase;
+late Session session;
+late User user;
+
+final Map<String, dynamic> userInfo = {
+  'email': '',
+  'password': '',
+};
 
 final Map<String, dynamic> athleteInfo = {
   'userId': '',
-  'email': '',
-  'password': '',
   'firstName': '',
   'lastName': '',
   'gender': '',
@@ -13,15 +20,11 @@ final Map<String, dynamic> athleteInfo = {
   'birthday': '',
   'city': '',
   'address': '',
-  'createdAt': Timestamp.now(),
-  'updatedAt': Timestamp.now(),
 };
 
 final Map<String, dynamic> avatarInfo = {
   'url': '',
   'userId': '',
-  'createdAt': Timestamp.now(),
-  'updatedAt': Timestamp.now(),
 };
 
 final Map<String, dynamic> subscriptionInfo = {
@@ -31,4 +34,5 @@ final Map<String, dynamic> subscriptionInfo = {
   'duration': '',
   'type': '',
   'dateSubscribed': '',
+  'dateExpired': '',
 };
