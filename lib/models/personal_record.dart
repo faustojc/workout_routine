@@ -1,13 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class PersonalRecord {
+class PersonalRecordModel {
+  final String id;
   final String userId;
   final String title;
-  final double weight;
-  final Timestamp createdAt;
-  final Timestamp updatedAt;
+  final num weight;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  PersonalRecord({
+  PersonalRecordModel({
+    required this.id,
     required this.userId,
     required this.title,
     required this.weight,
@@ -15,21 +15,24 @@ class PersonalRecord {
     required this.updatedAt,
   });
 
-  static List<PersonalRecord?> current = [];
+  static List<PersonalRecordModel?> list = [];
 
-  factory PersonalRecord.fromFirestoreDocument(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
-    final data = snapshot.data();
+  static List<PersonalRecordModel> fromJson(List<dynamic> json) {
+    final list = <PersonalRecordModel>[];
 
-    return PersonalRecord(
-      userId: data?['userId'],
-      title: data?['title'],
-      weight: data?['weight'],
-      createdAt: data?['createdAt'],
-      updatedAt: data?['updatedAt'],
-    );
-  }
+    for (var info in json) {
+      final data = info.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-  static List<PersonalRecord> fromFirestoreQuery(QuerySnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
-    return snapshot.docs.map((doc) => PersonalRecord.fromFirestoreDocument(doc, options)).toList();
+      list.add(PersonalRecordModel(
+        id: data['id'],
+        userId: data['userId'],
+        title: data['title'],
+        weight: data['weight'],
+        createdAt: data['createdAt'],
+        updatedAt: data['updatedAt'],
+      ));
+    }
+
+    return list;
   }
 }

@@ -1,39 +1,37 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class Subscription {
-  final String? userId;
-  final double price;
+class SubscriptionModel {
+  final String id;
+  final String userId;
+  final bool isSubscribed;
+  final num? price;
   final String? duration;
-  final Timestamp? dateSubscribed;
-  final Timestamp? dateExpired;
+  final DateTime? dateSubscribed;
+  final DateTime? dateExpired;
 
-  Subscription({
+  SubscriptionModel({
+    required this.id,
     required this.userId,
+    this.isSubscribed = false,
     required this.price,
     required this.duration,
     required this.dateSubscribed,
     required this.dateExpired,
   });
 
-  static Subscription? current;
+  static SubscriptionModel? current;
 
-  factory Subscription.fromFirestoreDocument(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
-    final data = snapshot.data();
+  factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
+    final data = json.map((key, value) {
+      if ((key == 'dateSubscribed' && value != null) || (key == 'dateExpired' && value != null)) {
+        return MapEntry(key, DateTime.parse(value));
+      } else {
+        return MapEntry(key, value);
+      }
+    });
 
-    return Subscription(
-      userId: data?['userId'],
-      price: data?['price'],
-      duration: data?['duration'],
-      dateSubscribed: data?['dateSubscribed'],
-      dateExpired: data?['dateExpired'],
-    );
-  }
-
-  factory Subscription.fromFirestoreQuery(QuerySnapshot<Map<String, dynamic>> snapshot) {
-    final data = snapshot.docs.first.data();
-
-    return Subscription(
+    return SubscriptionModel(
+      id: data['id'],
       userId: data['userId'],
+      isSubscribed: data['isSubscribed'],
       price: data['price'],
       duration: data['duration'],
       dateSubscribed: data['dateSubscribed'],
@@ -42,7 +40,9 @@ class Subscription {
   }
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'userId': userId,
+        'isSubscribed': isSubscribed,
         'price': price,
         'duration': duration,
         'dateSubscribed': dateSubscribed,

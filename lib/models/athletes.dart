@@ -1,26 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class Athlete {
-  late String? userId;
-  final String email;
-  final String password;
+class AthleteModel {
+  final String id;
+  final String userId;
   final String firstName;
   final String lastName;
   final String gender;
   final String city;
   final String address;
-  final String age;
-  final String weight;
-  final String height;
-  final bool isSubscribed;
-  final Timestamp birthday;
-  final Timestamp createdAt;
-  final Timestamp updatedAt;
+  final int age;
+  final num weight;
+  final num height;
+  final DateTime birthday;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  Athlete({
-    this.userId,
-    required this.email,
-    required this.password,
+  AthleteModel({
+    required this.id,
+    required this.userId,
     required this.firstName,
     required this.lastName,
     required this.gender,
@@ -32,40 +27,16 @@ class Athlete {
     required this.birthday,
     required this.createdAt,
     required this.updatedAt,
-    this.isSubscribed = false,
   });
 
-  static Athlete? current;
+  static AthleteModel? current;
 
-  factory Athlete.fromFirestoreDocument(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
-    final data = snapshot.data();
+  factory AthleteModel.fromJson(Map<String, dynamic> json) {
+    final data = json.map((key, value) => MapEntry(key, key == 'birthday' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    return Athlete(
-      userId: data?['userId'],
-      email: data?['email'],
-      password: data?['password'],
-      firstName: data?['firstName'],
-      lastName: data?['lastName'],
-      gender: data?['gender'],
-      city: data?['city'],
-      address: data?['address'],
-      age: data?['age'],
-      weight: data?['weight'],
-      height: data?['height'],
-      isSubscribed: data?['isSubscribed'],
-      birthday: data?['birthday'],
-      createdAt: data?['createdAt'],
-      updatedAt: data?['updatedAt'],
-    );
-  }
-
-  factory Athlete.fromFirestoreQuery(QuerySnapshot<Map<String, dynamic>> snapshot) {
-    final data = snapshot.docs.first.data();
-
-    return Athlete(
+    return AthleteModel(
+      id: data['id'],
       userId: data['userId'],
-      email: data['email'],
-      password: data['password'],
       firstName: data['firstName'],
       lastName: data['lastName'],
       gender: data['gender'],
@@ -74,37 +45,15 @@ class Athlete {
       age: data['age'],
       weight: data['weight'],
       height: data['height'],
-      isSubscribed: data['isSubscribed'],
       birthday: data['birthday'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
   }
 
-  factory Athlete.fromJson(Map<String, dynamic> json) {
-    return Athlete(
-      userId: json['userId'],
-      email: json['email'],
-      password: json['password'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      gender: json['gender'],
-      city: json['city'],
-      address: json['address'],
-      age: json['age'],
-      weight: json['weight'],
-      height: json['height'],
-      isSubscribed: json['isSubscribed'],
-      birthday: json['birthday'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-    );
-  }
-
   Map<String, dynamic> toJson() => {
+        'id': id,
         'userId': userId,
-        'email': email,
-        'password': password,
         'firstName': firstName,
         'lastName': lastName,
         'gender': gender,
@@ -113,7 +62,6 @@ class Athlete {
         'age': age,
         'weight': weight,
         'height': height,
-        'isSubscribed': isSubscribed,
         'birthdate': birthday,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
