@@ -21,7 +21,7 @@ class _SizeReportingWidgetState extends State<SizeReportingWidget> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final newSize = Size(constraints.minWidth, constraints.minHeight);
+        final newSize = Size(constraints.maxWidth, constraints.maxHeight);
         if (oldSize != newSize) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             widget.onSizeChange(newSize);
