@@ -3,8 +3,13 @@ import 'package:workout_routine/widgets/components/size_reporting_widget.dart';
 
 class ExpandablePageView extends StatefulWidget {
   final List<Widget> children;
+  final PageController controller;
 
-  const ExpandablePageView({super.key, required this.children});
+  const ExpandablePageView({
+    super.key,
+    required this.controller,
+    required this.children,
+  });
 
   @override
   State<ExpandablePageView> createState() => _ExpandablePageViewState();
@@ -23,13 +28,10 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
 
     super.initState();
 
-    _pageController = PageController()
-      ..addListener(() {
-        final newPage = _pageController.page?.round() ?? 0;
-        if (_currentPage != newPage) {
-          setState(() => _currentPage = newPage);
-        }
-      });
+    _pageController = widget.controller;
+    _pageController.addListener(() {
+      setState(() => _currentPage = _pageController.page!.round());
+    });
   }
 
   @override
