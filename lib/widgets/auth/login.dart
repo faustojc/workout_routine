@@ -60,7 +60,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         final userData = await supabase.from('users').select().eq('email', _emailController.text.trim()).eq('password', _passwordController.text.trim()).single();
         UserModel.current = UserModel.fromJson(userData);
 
-        Routes.redirectTo(context, '/');
+        Routes.redirectTo(context, RouteList.home);
       }).onError((AuthException error, _) {
         showToast(context: context, message: error.message, type: ToastType.error, vsync: this);
       }).whenComplete(() => setState(() => _isLoading = false));

@@ -96,7 +96,7 @@ class _RegisterFormState extends State<RegisterForm> {
               _overlayPortalController.hide();
 
               if (!_hasError) {
-                Routes.redirectTo(context, '/');
+                Routes.redirectTo(context, RouteList.home);
               }
             }
           }));
