@@ -73,118 +73,139 @@ class _PRCarouselState extends State<PRCarousel> {
     return '$month/$day/$year';
   }
 
+  Widget _indicators() => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(
+          PersonalRecordModel.list.length,
+          (index) => Container(
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: activePage == index ? ThemeColor.white : ThemeColor.secondary,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     if (PersonalRecordModel.list.isEmpty) {
       return _emptyPR();
     }
 
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: PersonalRecordModel.list.length,
-      itemBuilder: (context, int page) {
-        return _carousel(page);
-      },
-    );
-  }
+    return Column(
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 250),
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: PersonalRecordModel.list.length,
+            onPageChanged: (int page) {
+              setState(() => activePage = page);
+            },
+            itemBuilder: (context, int currentPage) {
+              final record = PersonalRecordModel.list[currentPage];
+              List<BoxShadow>? boxShadow = [];
+              Matrix4 transform = Matrix4.identity();
 
-  Widget _carousel(int currentPage) {
-    final record = PersonalRecordModel.list[currentPage];
+              if (activePage == currentPage) {
+                transform = Matrix4.identity()..translate(0.0, -10.0);
+                boxShadow = const [
+                  BoxShadow(
+                    color: ThemeColor.primary,
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                    offset: Offset(0, 8),
+                  ),
+                ];
+              } else {
+                transform = Matrix4.identity()..translate(0.0, 0.0);
+                boxShadow = [];
+              }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeOutQuint,
-      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-      decoration: BoxDecoration(
-        color: ThemeColor.white,
-        borderRadius: BorderRadius.circular(20.0),
-        boxShadow: const [
-          BoxShadow(
-            color: ThemeColor.black,
-            blurRadius: 10.0,
-            spreadRadius: 0.0,
-            offset: Offset(0.0, 0.0),
-          ),
-        ],
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: ThemeColor.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(
-              color: ThemeColor.black,
-              blurRadius: 10,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              record!.title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: ThemeColor.black,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'PR in lbs',
-                  style: TextStyle(fontSize: 12, color: ThemeColor.tertiary),
+              return AnimatedContainer(
+                height: MediaQuery.of(context).size.height * 0.5,
+                duration: const Duration(milliseconds: 500),
+                transform: transform,
+                curve: Curves.easeInOutCubic,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                decoration: BoxDecoration(
+                  color: activePage == currentPage ? ThemeColor.white : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: boxShadow,
                 ),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-              ],
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              'PR History',
-              style: TextStyle(
-                color: ThemeColor.black,
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                border: Border.fromBorderSide(BorderSide(color: ThemeColor.tertiary)),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${record.weight} lbs',
-                      textScaler: const TextScaler.linear(0.7),
+                      record!.title,
                       style: const TextStyle(
-                        color: ThemeColor.tertiary,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: ThemeColor.black,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'Date Entered ${_dateToString(record.createdAt)}',
-                      textScaler: const TextScaler.linear(0.7),
-                      style: const TextStyle(
-                        color: ThemeColor.tertiary,
-                        fontWeight: FontWeight.w500,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'PR in lbs',
+                          style: TextStyle(fontSize: 12, color: ThemeColor.tertiary),
+                        ),
+                        IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      'PR History',
+                      style: TextStyle(
+                        color: ThemeColor.black,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      decoration: const BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.fromBorderSide(BorderSide(color: ThemeColor.tertiary)),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${record.weight} lbs',
+                            textScaler: const TextScaler.linear(0.65),
+                            style: const TextStyle(
+                              color: ThemeColor.secondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            _dateToString(record.createdAt),
+                            textScaler: const TextScaler.linear(0.65),
+                            style: const TextStyle(
+                              color: ThemeColor.secondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
-      ),
+        _indicators(),
+      ],
     );
   }
 }

@@ -59,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
               appBar: AppBar(
                 backgroundColor: ThemeColor.primary,
                 foregroundColor: ThemeColor.white,
-                elevation: 0,
+                elevation: 0.0,
               ),
               drawer: Drawer(
                 backgroundColor: ThemeColor.primary,
@@ -134,39 +134,44 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         color: ThemeColor.tertiary,
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ListTile(
-                              leading: const Icon(Icons.person),
-                              title: const Text(
-                                'Profile',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              onTap: () {},
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.notifications),
-                              title: const Text(
-                                'Notifications',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              onTap: () {},
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.info),
-                              title: const Text(
-                                'Terms & Conditions',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              onTap: () {},
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.settings),
-                              title: const Text(
-                                'Settings',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              onTap: () {},
+                            Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.person),
+                                  title: const Text(
+                                    'Profile',
+                                    style: TextStyle(fontWeight: FontWeight.w700),
+                                  ),
+                                  onTap: () {},
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.notifications),
+                                  title: const Text(
+                                    'Notifications',
+                                    style: TextStyle(fontWeight: FontWeight.w700),
+                                  ),
+                                  onTap: () {},
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.info),
+                                  title: const Text(
+                                    'Terms & Conditions',
+                                    style: TextStyle(fontWeight: FontWeight.w700),
+                                  ),
+                                  onTap: () {},
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.settings),
+                                  title: const Text(
+                                    'Settings',
+                                    style: TextStyle(fontWeight: FontWeight.w700),
+                                  ),
+                                  onTap: () {},
+                                ),
+                              ],
                             ),
                             ListTile(
                               leading: const Icon(Icons.logout),
@@ -174,7 +179,9 @@ class _DashboardState extends State<Dashboard> {
                                 'Logout',
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               ),
-                              onTap: () {},
+                              onTap: () {
+                                supabase.auth.signOut().then((value) => Routes.redirectTo(context, '/auth'));
+                              },
                             ),
                           ],
                         ),
@@ -205,77 +212,92 @@ class _DashboardState extends State<Dashboard> {
                     end: Alignment.bottomCenter,
                   ),
                 ),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverFillRemaining(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            'Welcome! ${AthleteModel.current!.lastName}',
+                            style: const TextStyle(
+                              color: ThemeColor.tertiary,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              color: ThemeColor.white,
+                            ),
+                            child: Text(
+                              AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                              style: const TextStyle(
+                                color: ThemeColor.secondary,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'Welcome! ${AthleteModel.current!.lastName}',
-                                  style: const TextStyle(
-                                    color: ThemeColor.tertiary,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                const Text(
+                                  'Personal Record',
+                                  style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
-                                const SizedBox(height: 10),
-                                Container(
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                    color: ThemeColor.white,
+                                OutlinedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.add, size: 15),
+                                  label: const Text(
+                                    'Add',
+                                    style: TextStyle(fontSize: 12),
                                   ),
-                                  child: Text(
-                                    AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
-                                    style: const TextStyle(
-                                      color: ThemeColor.secondary,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: ThemeColor.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        'Personal Record',
-                                        style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.w500),
-                                      ),
-                                      OutlinedButton.icon(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.add, size: 15),
-                                        label: const Text(
-                                          'Add',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: ThemeColor.white,
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          side: const BorderSide(color: ThemeColor.white),
-                                        ),
-                                      ),
-                                    ],
+                                    side: const BorderSide(color: ThemeColor.white),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Expanded(
-                            child: PRCarousel(),
-                          ),
                         ],
+                      ),
+                    ),
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 300),
+                        child: const PRCarousel(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeColor.secondary,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        'Start Workout',
+                        style: TextStyle(
+                          color: ThemeColor.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
