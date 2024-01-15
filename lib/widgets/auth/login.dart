@@ -61,8 +61,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         UserModel.current = UserModel.fromJson(userData);
 
         Routes.redirectTo(context, '/');
-      }).onError((error, stackTrace) {
-        showToast(context: context, message: error.toString(), type: ToastType.error, vsync: this);
+      }).onError((AuthException error, _) {
+        showToast(context: context, message: error.message, type: ToastType.error, vsync: this);
       }).whenComplete(() => setState(() => _isLoading = false));
     }
   }
