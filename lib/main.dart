@@ -5,7 +5,7 @@ import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/components/loading.dart';
-import 'package:workout_routine/widgets/dashboard/user/dashboard.dart';
+import 'package:workout_routine/widgets/user/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +43,7 @@ class MainApp extends StatelessWidget {
             if (snapshot.data?.session != null) {
               session = snapshot.data!.session!;
 
-              return const Dashboard();
+              return const Home();
             } else {
               return const MainAuth();
             }
