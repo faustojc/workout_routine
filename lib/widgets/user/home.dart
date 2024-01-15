@@ -11,14 +11,14 @@ import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/loading.dart';
 import 'package:workout_routine/widgets/components/pr_carousel.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<Home> createState() => _HomeState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _HomeState extends State<Home> {
   late Future<Map<String, dynamic>?> _fetchUserData;
 
   @override
@@ -59,7 +59,6 @@ class _DashboardState extends State<Dashboard> {
               appBar: AppBar(
                 backgroundColor: ThemeColor.primary,
                 foregroundColor: ThemeColor.white,
-                elevation: 0.0,
               ),
               drawer: Drawer(
                 backgroundColor: ThemeColor.primary,
@@ -145,7 +144,7 @@ class _DashboardState extends State<Dashboard> {
                                     'Profile',
                                     style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
-                                  onTap: () {},
+                                  onTap: () => Routes.to(context, RouteList.home, 'left'),
                                 ),
                                 ListTile(
                                   leading: const Icon(Icons.notifications),
@@ -180,7 +179,7 @@ class _DashboardState extends State<Dashboard> {
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               ),
                               onTap: () {
-                                supabase.auth.signOut().then((value) => Routes.redirectTo(context, '/auth'));
+                                supabase.auth.signOut().then((value) => Routes.redirectTo(context, RouteList.auth));
                               },
                             ),
                           ],
