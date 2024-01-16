@@ -50,9 +50,9 @@ class _HomeState extends State<Home> {
             return const Loading();
           } else {
             UserModel.current = UserModel.fromJson(snapshot.data!);
-            AthleteModel.current = AthleteModel.fromJson(snapshot.data!['athletes'][0]);
-            PersonalRecordModel.list = PersonalRecordModel.fromJson(snapshot.data!['personal_records']);
-            SubscriptionModel.current = SubscriptionModel.fromJson(snapshot.data!['subscriptions'][0]);
+            AthleteModel.current = AthleteModel.fromJson(snapshot.data?['athletes'][0]);
+            PersonalRecordModel.list = PersonalRecordModel.fromJson(snapshot.data?['personal_records']);
+            SubscriptionModel.current = SubscriptionModel.fromJson(snapshot.data?['subscriptions'][0]);
 
             return Scaffold(
               resizeToAvoidBottomInset: true,
@@ -144,7 +144,7 @@ class _HomeState extends State<Home> {
                                     'Profile',
                                     style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
-                                  onTap: () => Routes.to(context, RouteList.home, 'left'),
+                                  onTap: () => Routes.to(context, RouteList.home, 'right'),
                                 ),
                                 ListTile(
                                   leading: const Icon(Icons.notifications),
