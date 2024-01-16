@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
+import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
 
@@ -7,6 +8,7 @@ enum RouteList {
   home,
   auth,
   profile,
+  editProfile,
 }
 
 extension RouteListExtension on RouteList {
@@ -18,6 +20,8 @@ extension RouteListExtension on RouteList {
         return '/auth';
       case RouteList.profile:
         return '/profile';
+      case RouteList.editProfile:
+        return '/edit_profile';
     }
   }
 }
@@ -28,6 +32,7 @@ class Routes {
     RouteList.home: (_) => const Home(),
     RouteList.auth: (_) => const MainAuth(),
     RouteList.profile: (_) => const Profile(),
+    RouteList.editProfile: (_) => const EditProfile(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
