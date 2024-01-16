@@ -1,14 +1,12 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/models/subscription.dart';
 import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
+import 'package:workout_routine/widgets/components/status_alert_dialog.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -53,7 +51,7 @@ class _RegisterFormState extends State<RegisterForm> {
         if (key == 'birthday' && value != null && value is String) {
           final formattedDate = value.toString().split(' ')[0].split('/');
 
-          athleteInfo[key] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0]));
+          athleteInfo[key] = DateTime(int.parse(formattedDate[2]), int.parse(formattedDate[1]), int.parse(formattedDate[0])).microsecondsSinceEpoch;
         }
 
         return MapEntry(key, value);
@@ -76,9 +74,6 @@ class _RegisterFormState extends State<RegisterForm> {
 
         final athleteData = await supabase.from('athletes').insert(athleteInfo).single();
         AthleteModel.current = AthleteModel.fromJson(athleteData);
-
-        final subData = await supabase.from('subscriptions').insert({'userId': userData['id']}).single();
-        SubscriptionModel.current = SubscriptionModel.fromJson(subData);
 
         setState(() {
           _currentStatusText = 'Registration successful! Email confirmation was sent to ${userInfo['email']} to verify your account.';
@@ -532,53 +527,6 @@ class _UserAthleteFormState extends State<UserAthleteForm> {
             decoration: FieldDecoration.outlined,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class StatusAlertDialog extends StatefulWidget {
-  final Widget currentStatusIndicator;
-  final String currentStatusText;
-
-  const StatusAlertDialog({
-    super.key,
-    required this.currentStatusIndicator,
-    required this.currentStatusText,
-  });
-
-  @override
-  State<StatusAlertDialog> createState() => _StatusAlertDialogState();
-}
-
-class _StatusAlertDialogState extends State<StatusAlertDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return AbsorbPointer(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: AlertDialog(
-          alignment: Alignment.center,
-          content: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                switchOutCurve: Curves.easeOut,
-                child: widget.currentStatusIndicator,
-              ),
-              const SizedBox(width: 20),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                switchOutCurve: Curves.easeOut,
-                child: Text(widget.currentStatusText),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
