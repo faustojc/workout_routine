@@ -1,49 +1,49 @@
-class PeriodizationModel {
+class WorkoutParameterModel {
   final String id;
+  final String workoutId;
   final String name;
-  final String? acronym;
-  final String description;
+  final String value;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  PeriodizationModel({
+  WorkoutParameterModel({
     required this.id,
+    required this.workoutId,
     required this.name,
-    this.acronym,
-    required this.description,
+    required this.value,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  static PeriodizationModel? current;
-  static List<PeriodizationModel>? list;
+  static WorkoutParameterModel? current;
+  static List<WorkoutParameterModel>? list;
 
-  factory PeriodizationModel.fromJson(Map<String, dynamic> json) {
+  factory WorkoutParameterModel.fromJson(Map<String, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    return PeriodizationModel(
+    return WorkoutParameterModel(
       id: data['id'],
+      workoutId: data['workoutId'],
       name: data['name'],
-      acronym: data['acronym'],
-      description: data['description'],
+      value: data['value'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
   }
 
-  static List<PeriodizationModel> fromList(List<dynamic> json) {
+  static List<WorkoutParameterModel> fromList(List<dynamic> json) {
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-      return PeriodizationModel.fromJson(data);
+      return WorkoutParameterModel.fromJson(data);
     }).toList();
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'workoutId': workoutId,
         'name': name,
-        'acronym': acronym,
-        'description': description,
+        'value': value,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };

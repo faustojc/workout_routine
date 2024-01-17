@@ -19,7 +19,7 @@ class WeekModel {
   static List<WeekModel>? list;
 
   factory WeekModel.fromJson(Map<String, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return WeekModel(
       id: data['id'],
@@ -29,6 +29,14 @@ class WeekModel {
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
+  }
+
+  static List<WeekModel> fromJsonList(List<dynamic> json) {
+    return json.map((e) {
+      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+
+      return WeekModel.fromJson(data);
+    }).toList();
   }
 
   Map<String, dynamic> toJson() => {

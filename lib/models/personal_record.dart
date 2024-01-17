@@ -13,23 +13,26 @@ class PersonalRecordModel {
     required this.updatedAt,
   });
 
+  static PersonalRecordModel? current;
   static List<PersonalRecordModel?> list = [];
 
-  static List<PersonalRecordModel> fromJson(List<dynamic> json) {
-    final list = <PersonalRecordModel>[];
+  factory PersonalRecordModel.fromJson(Map<String, dynamic> json) {
+    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    for (var info in json) {
-      final data = info.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    return PersonalRecordModel(
+      id: data['id'],
+      userId: data['userId'],
+      title: data['title'],
+      createdAt: data['createdAt'],
+      updatedAt: data['updatedAt'],
+    );
+  }
 
-      list.add(PersonalRecordModel(
-        id: data['id'],
-        userId: data['userId'],
-        title: data['title'],
-        createdAt: data['createdAt'],
-        updatedAt: data['updatedAt'],
-      ));
-    }
+  static List<PersonalRecordModel> fromList(List<dynamic> json) {
+    return json.map((e) {
+      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    return list;
+      return PersonalRecordModel.fromJson(data);
+    }).toList();
   }
 }

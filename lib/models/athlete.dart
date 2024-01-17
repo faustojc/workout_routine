@@ -32,9 +32,10 @@ class AthleteModel {
   });
 
   static AthleteModel? current;
+  static List<AthleteModel>? list;
 
   factory AthleteModel.fromJson(Map<String, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'birthday' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'birthday' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return AthleteModel(
       id: data['id'],
@@ -52,6 +53,14 @@ class AthleteModel {
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
+  }
+
+  static List<AthleteModel> fromList(List<dynamic> json) {
+    return json.map((e) {
+      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'birthday' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+
+      return AthleteModel.fromJson(data);
+    }).toList();
   }
 
   Map<String, dynamic> toJson() => {

@@ -23,7 +23,7 @@ class Workouts {
   static List<Workouts>? list;
 
   factory Workouts.fromJson(Map<String, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return Workouts(
       id: data['id'],
@@ -35,6 +35,14 @@ class Workouts {
       createdAt: data['created_at'],
       updatedAt: data['updated_at'],
     );
+  }
+
+  static List<Workouts> fromJsonList(List<dynamic> json) {
+    return json.map((e) {
+      final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+
+      return Workouts.fromJson(data);
+    }).toList();
   }
 
   Map<String, dynamic> toJson() => {

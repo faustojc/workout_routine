@@ -17,7 +17,7 @@ class PRHistoryModel {
   static List<PRHistoryModel>? list;
 
   factory PRHistoryModel.fromJson(Map<String, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' ? DateTime.parse(value) : value));
 
     return PRHistoryModel(
       id: data['id'],
@@ -26,6 +26,14 @@ class PRHistoryModel {
       weight: data['weight'],
       createdAt: data['createdAt'],
     );
+  }
+
+  static List<PRHistoryModel> fromList(List<dynamic> json) {
+    return json.map((e) {
+      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' ? DateTime.parse(value) : value));
+
+      return PRHistoryModel.fromJson(data);
+    }).toList();
   }
 
   Map<String, dynamic> toJson() => {
