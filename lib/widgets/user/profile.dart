@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/athlete.dart';
 import 'package:workout_routine/models/subscription.dart';
 import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/themes/colors.dart';
