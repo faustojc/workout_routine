@@ -14,7 +14,7 @@ class UserModel {
   });
 
   static UserModel? current;
-  static List<UserModel>? list;
+  static List<UserModel> list = [];
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));

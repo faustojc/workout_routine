@@ -14,7 +14,7 @@ class PersonalRecordModel {
   });
 
   static PersonalRecordModel? current;
-  static List<PersonalRecordModel?> list = [];
+  static List<PersonalRecordModel> list = [];
 
   factory PersonalRecordModel.fromJson(Map<String, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));

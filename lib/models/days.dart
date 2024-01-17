@@ -16,7 +16,7 @@ class DayModel {
   });
 
   static DayModel? current;
-  static List<DayModel>? list;
+  static List<DayModel> list = [];
 
   factory DayModel.fromJson(Map<String, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
