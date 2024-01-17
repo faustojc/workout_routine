@@ -1,31 +1,25 @@
-class DayModel {
+class CategoryModel {
   final String id;
-  final String weekId;
-  final String title;
-  final String? subtitle;
+  final String name;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  DayModel({
+  CategoryModel({
     required this.id,
-    required this.weekId,
-    required this.title,
-    this.subtitle,
+    required this.name,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  static DayModel? current;
-  static List<DayModel>? list;
+  static CategoryModel? current;
+  static List<CategoryModel>? list;
 
-  factory DayModel.fromJson(Map<String, dynamic> json) {
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    return DayModel(
+    return CategoryModel(
       id: data['id'],
-      weekId: data['weekId'],
-      title: data['title'],
-      subtitle: data['subtitle'],
+      name: data['name'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
@@ -33,9 +27,7 @@ class DayModel {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'weekId': weekId,
-        'title': title,
-        'subtitle': subtitle,
+        'name': name,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };
