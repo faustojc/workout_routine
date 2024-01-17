@@ -1,6 +1,7 @@
 class AthleteModel {
   final String id;
   final String userId;
+  final String? categoryId;
   final String firstName;
   final String lastName;
   final String gender;
@@ -16,6 +17,7 @@ class AthleteModel {
   AthleteModel({
     required this.id,
     required this.userId,
+    this.categoryId,
     required this.firstName,
     required this.lastName,
     required this.gender,
@@ -37,6 +39,7 @@ class AthleteModel {
     return AthleteModel(
       id: data['id'],
       userId: data['userId'],
+      categoryId: data['categoryId'],
       firstName: data['firstName'],
       lastName: data['lastName'],
       gender: data['gender'],
@@ -54,6 +57,7 @@ class AthleteModel {
   Map<String, dynamic> toJson() => {
         'id': id,
         'userId': userId,
+        'categoryId': categoryId,
         'firstName': firstName,
         'lastName': lastName,
         'gender': gender,
