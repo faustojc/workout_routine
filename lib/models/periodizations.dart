@@ -19,7 +19,7 @@ class PeriodizationModel {
   static List<PeriodizationModel> list = [];
 
   factory PeriodizationModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return PeriodizationModel(
       id: data['id'],
@@ -33,7 +33,7 @@ class PeriodizationModel {
 
   static List<PeriodizationModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return PeriodizationModel.fromJson(data);
     }).toList();

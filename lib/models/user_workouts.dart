@@ -19,7 +19,7 @@ class UserWorkoutModel {
   static List<UserWorkoutModel> list = [];
 
   factory UserWorkoutModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return UserWorkoutModel(
       id: data['id'],
@@ -35,7 +35,7 @@ class UserWorkoutModel {
     if (json == null) return [];
 
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return UserWorkoutModel.fromJson(data);
     }).toList();

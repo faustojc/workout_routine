@@ -17,7 +17,7 @@ class UserModel {
   static List<UserModel> list = [];
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return UserModel(
       id: data['id'],
@@ -30,7 +30,7 @@ class UserModel {
 
   static List<UserModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return UserModel.fromJson(data);
     }).toList();
