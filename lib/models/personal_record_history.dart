@@ -28,7 +28,9 @@ class PRHistoryModel {
     );
   }
 
-  static List<PRHistoryModel> fromList(List<dynamic> json) {
+  static List<PRHistoryModel> fromList(List<dynamic>? json) {
+    if (json == null) return [];
+
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' ? DateTime.parse(value) : value));
 

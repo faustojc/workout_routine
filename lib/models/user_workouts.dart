@@ -31,7 +31,9 @@ class UserWorkoutModel {
     );
   }
 
-  static List<UserWorkoutModel> fromList(List<dynamic> json) {
+  static List<UserWorkoutModel> fromList(List<dynamic>? json) {
+    if (json == null) return [];
+
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 

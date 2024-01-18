@@ -28,7 +28,9 @@ class PersonalRecordModel {
     );
   }
 
-  static List<PersonalRecordModel> fromList(List<dynamic> json) {
+  static List<PersonalRecordModel> fromList(List<dynamic>? json) {
+    if (json == null) return [];
+
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
