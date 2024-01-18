@@ -34,7 +34,7 @@ class AthleteModel {
   static AthleteModel? current;
   static List<AthleteModel> list = [];
 
-  factory AthleteModel.fromJson(Map<String, dynamic> json) {
+  factory AthleteModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'birthday' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return AthleteModel(

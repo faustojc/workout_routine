@@ -18,7 +18,7 @@ class PeriodizationModel {
   static PeriodizationModel? current;
   static List<PeriodizationModel> list = [];
 
-  factory PeriodizationModel.fromJson(Map<String, dynamic> json) {
+  factory PeriodizationModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return PeriodizationModel(

@@ -18,7 +18,7 @@ class WeekModel {
   static WeekModel? current;
   static List<WeekModel> list = [];
 
-  factory WeekModel.fromJson(Map<String, dynamic> json) {
+  factory WeekModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return WeekModel(

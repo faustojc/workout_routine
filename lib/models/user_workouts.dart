@@ -18,7 +18,7 @@ class UserWorkoutModel {
   static UserWorkoutModel? current;
   static List<UserWorkoutModel> list = [];
 
-  factory UserWorkoutModel.fromJson(Map<String, dynamic> json) {
+  factory UserWorkoutModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return UserWorkoutModel(

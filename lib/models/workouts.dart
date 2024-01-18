@@ -22,7 +22,7 @@ class Workouts {
   static Workouts? current;
   static List<Workouts> list = [];
 
-  factory Workouts.fromJson(Map<String, dynamic> json) {
+  factory Workouts.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return Workouts(

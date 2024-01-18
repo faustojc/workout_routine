@@ -19,7 +19,7 @@ class SubscriptionModel {
 
   static SubscriptionModel? current;
 
-  factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
+  factory SubscriptionModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) {
       if ((key == 'dateSubscribed' && value != null) || (key == 'dateExpired' && value != null)) {
         return MapEntry(key, DateTime.parse(value));

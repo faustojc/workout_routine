@@ -18,7 +18,7 @@ class WorkoutParameterModel {
   static WorkoutParameterModel? current;
   static List<WorkoutParameterModel> list = [];
 
-  factory WorkoutParameterModel.fromJson(Map<String, dynamic> json) {
+  factory WorkoutParameterModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, (key is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return WorkoutParameterModel(
