@@ -19,7 +19,7 @@ class DayModel {
   static List<DayModel> list = [];
 
   factory DayModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return DayModel(
       id: data['id'],
@@ -33,7 +33,7 @@ class DayModel {
 
   static List<DayModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return DayModel.fromJson(data);
     }).toList();

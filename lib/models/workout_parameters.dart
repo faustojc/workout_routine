@@ -19,7 +19,7 @@ class WorkoutParameterModel {
   static List<WorkoutParameterModel> list = [];
 
   factory WorkoutParameterModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return WorkoutParameterModel(
       id: data['id'],
@@ -33,7 +33,7 @@ class WorkoutParameterModel {
 
   static List<WorkoutParameterModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return WorkoutParameterModel.fromJson(data);
     }).toList();

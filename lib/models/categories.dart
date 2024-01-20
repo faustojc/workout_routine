@@ -15,7 +15,7 @@ class CategoryModel {
   static List<CategoryModel> list = [];
 
   factory CategoryModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
     return CategoryModel(
       id: data['id'],
@@ -27,7 +27,7 @@ class CategoryModel {
 
   static List<CategoryModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, (value is! DateTime) && key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
       return CategoryModel.fromJson(data);
     }).toList();
