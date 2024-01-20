@@ -3,13 +3,9 @@ import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
+import 'package:workout_routine/widgets/workouts/periodization_page.dart';
 
-enum RouteList {
-  home,
-  auth,
-  profile,
-  editProfile,
-}
+enum RouteList { home, auth, profile, editProfile, workout }
 
 extension RouteListExtension on RouteList {
   String get name {
@@ -22,6 +18,8 @@ extension RouteListExtension on RouteList {
         return '/profile';
       case RouteList.editProfile:
         return '/edit_profile';
+      case RouteList.workout:
+        return '/workout';
     }
   }
 }
@@ -33,6 +31,7 @@ class Routes {
     RouteList.auth: (_) => const MainAuth(),
     RouteList.profile: (_) => const Profile(),
     RouteList.editProfile: (_) => const EditProfile(),
+    RouteList.workout: (_) => const PeriodizationPage(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -60,10 +59,10 @@ class Routes {
         var end = Offset.zero;
         var curve = Curves.easeInOut;
 
-        if (direction == 'left') {
+        if (direction == 'right') {
           begin = const Offset(1.0, 0.0);
           end = Offset.zero;
-        } else if (direction == 'right') {
+        } else if (direction == 'left') {
           begin = const Offset(-1.0, 0.0);
           end = Offset.zero;
         }
@@ -78,23 +77,14 @@ class Routes {
   }
 
   static void redirectTo(BuildContext context, RouteList routeName) {
-    Route route = PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => _routes[routeName]!(context),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = const Offset(0.0, 1.0);
-        var end = Offset.zero;
-        var curve = Curves.easeInOut;
-
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(position: animation.drive(tween), child: child);
-      },
-    );
-
-    Navigator.of(context).pushAndRemoveUntil(route, (route) => route.isCurrent && (route.settings.name == routeName.name));
+    Navigator.of(context).pushNamedAndRemoveUntil(routeName.name, (route) => route.isCurrent && (route.settings.name == routeName.name));
   }
 
   static void back(BuildContext context) {
     Navigator.of(context).pop();
+  }
+
+  static void popAndTo(BuildContext context, RouteList routeName) {
+    Navigator.of(context).popAndPushNamed(routeName.name);
   }
 }
