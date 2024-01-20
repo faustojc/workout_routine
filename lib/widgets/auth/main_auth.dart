@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:workout_routine/data/user.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/auth/register.dart';
 
@@ -16,13 +18,32 @@ class _MainAuthState extends State<MainAuth> {
     LoginForm(key: ValueKey(1)),
     RegisterForm(key: ValueKey(2)),
   ];
-
   int _currentIndex = 0;
 
-  void _changePage(int index) {
-    setState(() {
-      _currentIndex = index;
+  @override
+  void initState() {
+    _checkAuth();
+
+    super.initState();
+  }
+
+  void _checkAuth() {
+    supabase.auth.onAuthStateChange.listen((data) {
+      final currSession = data.session;
+
+      if (currSession != null && mounted) {
+        session = data.session!;
+        user = data.session!.user;
+
+        Routes.redirectTo(context, RouteList.home);
+
+        return;
+      }
     });
+  }
+
+  void _changePage(int index) {
+    setState(() => _currentIndex = index);
   }
 
   @override
