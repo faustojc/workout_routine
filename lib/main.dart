@@ -1,15 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
-import 'package:workout_routine/widgets/components/loading.dart';
-import 'package:workout_routine/widgets/user/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Supabase.initialize(
     url: 'https://fubkrstvdjgoytlbqjax.supabase.co',
     anonKey:
@@ -28,30 +27,15 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Workout Routine',
+      title: 'Strength and Conditioning',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
         fontFamily: 'SpaceGrotesk',
         useMaterial3: true,
       ),
-      home: StreamBuilder<AuthState?>(
-        stream: supabase.auth.onAuthStateChange,
-        builder: (BuildContext context, AsyncSnapshot<AuthState?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Loading();
-          } else {
-            if (snapshot.data?.session != null) {
-              session = snapshot.data!.session!;
-
-              return const Home();
-            } else {
-              return const MainAuth();
-            }
-          }
-        },
-      ),
       onGenerateRoute: Routes.generateRoute,
       debugShowCheckedModeBanner: false,
+      home: const MainAuth(),
     );
   }
 }
