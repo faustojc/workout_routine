@@ -14,11 +14,6 @@ class TileField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(color: ThemeColor.tertiary),
-        borderRadius: BorderRadius.circular(15),
-      ),
       leading: Text(
         leading,
         style: const TextStyle(
@@ -29,6 +24,8 @@ class TileField extends StatelessWidget {
       ),
       title: Text(
         title,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
         style: const TextStyle(color: ThemeColor.tertiary, fontSize: 14),
       ),
     );
