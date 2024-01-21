@@ -13,7 +13,7 @@ class RecentWorkout extends StatefulWidget {
 class _RecentWorkoutState extends State<RecentWorkout> {
   @override
   Widget build(BuildContext context) {
-    if (Workouts.current == null) {
+    if (WorkoutModel.current == null) {
       return Container(
           padding: const EdgeInsets.all(20.0),
           width: MediaQuery.of(context).size.width,
@@ -54,7 +54,7 @@ class _RecentWorkoutState extends State<RecentWorkout> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
-          image: NetworkImage(Workouts.current!.thumbnailUrl),
+          image: NetworkImage(WorkoutModel.current!.thumbnailUrl),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
         ),
@@ -64,7 +64,7 @@ class _RecentWorkoutState extends State<RecentWorkout> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            Workouts.current!.title,
+            WorkoutModel.current!.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -73,7 +73,7 @@ class _RecentWorkoutState extends State<RecentWorkout> {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: WorkoutParameterModel.list.where((workoutParam) => workoutParam.workoutId == Workouts.current!.id).map((workoutParam) {
+            children: WorkoutParameterModel.list.where((workoutParam) => workoutParam.workoutId == WorkoutModel.current!.id).map((workoutParam) {
               return Text(
                 '${workoutParam.name}: ${workoutParam.value}',
                 style: const TextStyle(

@@ -1,4 +1,4 @@
-class Workouts {
+class WorkoutModel {
   final String id;
   final String daysId;
   final String title;
@@ -8,7 +8,7 @@ class Workouts {
   final String? createdAt;
   final String? updatedAt;
 
-  Workouts({
+  WorkoutModel({
     required this.id,
     required this.daysId,
     required this.title,
@@ -19,13 +19,13 @@ class Workouts {
     this.updatedAt,
   });
 
-  static Workouts? current;
-  static List<Workouts> list = [];
+  static WorkoutModel? current;
+  static List<WorkoutModel> list = [];
 
-  factory Workouts.fromJson(Map<dynamic, dynamic> json) {
+  factory WorkoutModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-    return Workouts(
+    return WorkoutModel(
       id: data['id'],
       daysId: data['daysId'],
       title: data['title'],
@@ -37,11 +37,11 @@ class Workouts {
     );
   }
 
-  static List<Workouts> fromJsonList(List<dynamic> json) {
+  static List<WorkoutModel> fromJsonList(List<dynamic> json) {
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
-      return Workouts.fromJson(data);
+      return WorkoutModel.fromJson(data);
     }).toList();
   }
 

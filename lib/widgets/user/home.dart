@@ -278,7 +278,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           const PersonalRecordsGrid(),
                           const SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: () => Routes.to(context, RouteList.workout, 'right'),
+                            onPressed: () => Routes.to(context, RouteList.startWorkout, 'right'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ThemeColor.primary,
                               shape: RoundedRectangleBorder(
