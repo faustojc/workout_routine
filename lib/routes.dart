@@ -3,9 +3,22 @@ import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
+import 'package:workout_routine/widgets/workouts/days_page.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
+import 'package:workout_routine/widgets/workouts/start_page.dart';
+import 'package:workout_routine/widgets/workouts/weeks_page.dart';
 
-enum RouteList { home, auth, profile, editProfile, workout }
+enum RouteList {
+  home,
+  auth,
+  profile,
+  editProfile,
+  startWorkout,
+  periodization,
+  weeks,
+  days,
+  workouts,
+}
 
 extension RouteListExtension on RouteList {
   String get name {
@@ -18,8 +31,16 @@ extension RouteListExtension on RouteList {
         return '/profile';
       case RouteList.editProfile:
         return '/edit_profile';
-      case RouteList.workout:
-        return '/workout';
+      case RouteList.startWorkout:
+        return '/start_workout';
+      case RouteList.periodization:
+        return '/periodization';
+      case RouteList.weeks:
+        return '/weeks';
+      case RouteList.days:
+        return '/days';
+      case RouteList.workouts:
+        return '/workouts';
     }
   }
 }
@@ -31,7 +52,10 @@ class Routes {
     RouteList.auth: (_) => const MainAuth(),
     RouteList.profile: (_) => const Profile(),
     RouteList.editProfile: (_) => const EditProfile(),
-    RouteList.workout: (_) => const PeriodizationPage(),
+    RouteList.startWorkout: (_) => const StartWorkout(),
+    RouteList.periodization: (_) => const PeriodizationPage(),
+    RouteList.weeks: (_) => const WeeksPage(),
+    RouteList.days: (_) => const DaysPage(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
