@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:workout_routine/models/days.dart';
 import 'package:workout_routine/models/weeks.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/empty_content.dart';
 
 class WeeksPage extends StatelessWidget {
   const WeeksPage({super.key});
+
+  bool _isDataEmpty() => DayModel.list.where((day) => day.weeksId == WeekModel.current!.id).isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -36,38 +39,47 @@ class WeeksPage extends StatelessWidget {
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  WeekModel.current!.title,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    WeekModel.current!.title,
+                    textScaler: const TextScaler.linear(3.0),
+                    style: const TextStyle(color: ThemeColor.tertiary, fontWeight: FontWeight.w700, letterSpacing: 0.8),
+                  ),
                 ),
-                (DayModel.list.isEmpty)
+                (_isDataEmpty())
                     ? const EmptyContent(title: "No days yet", subtitle: "This content is not available yet")
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: DayModel.list
-                            .where((day) => day.weekId == WeekModel.current!.id)
-                            .map(
-                              (day) => ElevatedButton(
-                                  onPressed: () {
-                                    DayModel.current = day;
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ThemeColor.secondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    day.title,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 18, color: ThemeColor.white, fontWeight: FontWeight.w700),
-                                  )),
-                            )
-                            .toList(),
-                      ),
+                    : Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: DayModel.list
+                                .where((day) => day.weeksId == WeekModel.current!.id)
+                                .map(
+                                  (day) => ElevatedButton(
+                                      onPressed: () {
+                                        DayModel.current = day;
+                                        Navigator.of(context).pushNamed(RouteList.days.name);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: ThemeColor.secondary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        day.title,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 18, color: ThemeColor.white, fontWeight: FontWeight.w700),
+                                      )),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      )
               ],
             )));
   }

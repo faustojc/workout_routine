@@ -7,6 +7,8 @@ import 'package:workout_routine/widgets/components/empty_content.dart';
 class DaysPage extends StatelessWidget {
   const DaysPage({super.key});
 
+  bool _isDataEmpty() => WorkoutModel.list.where((workout) => workout.daysId == DayModel.current!.id).isEmpty;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,38 +38,46 @@ class DaysPage extends StatelessWidget {
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  DayModel.current!.title,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    DayModel.current!.title,
+                    textScaler: const TextScaler.linear(3.0),
+                    style: const TextStyle(color: ThemeColor.tertiary, fontWeight: FontWeight.w700, letterSpacing: 0.8),
+                  ),
                 ),
-                (DayModel.list.isEmpty)
-                    ? const EmptyContent(title: "No days yet", subtitle: "This content is not available yet")
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: WorkoutModel.list
-                            .where((workout) => workout.daysId == DayModel.current!.id)
-                            .map(
-                              (workout) => ElevatedButton(
-                                  onPressed: () {
-                                    WorkoutModel.current = workout;
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ThemeColor.secondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    workout.title,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 18, color: ThemeColor.white, fontWeight: FontWeight.w700),
-                                  )),
-                            )
-                            .toList(),
-                      ),
+                (_isDataEmpty())
+                    ? const EmptyContent(title: "No workouts yet", subtitle: "This content is not available yet")
+                    : Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: WorkoutModel.list
+                                .where((workout) => workout.daysId == DayModel.current!.id)
+                                .map(
+                                  (workout) => ElevatedButton(
+                                      onPressed: () {
+                                        WorkoutModel.current = workout;
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: ThemeColor.secondary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        workout.title,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 18, color: ThemeColor.white, fontWeight: FontWeight.w700),
+                                      )),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      )
               ],
             )));
   }
