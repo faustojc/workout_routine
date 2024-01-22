@@ -7,6 +7,7 @@ import 'package:workout_routine/widgets/workouts/days_page.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
 import 'package:workout_routine/widgets/workouts/start_page.dart';
 import 'package:workout_routine/widgets/workouts/weeks_page.dart';
+import 'package:workout_routine/widgets/workouts/workout_page.dart';
 
 enum RouteList {
   home,
@@ -56,6 +57,7 @@ class Routes {
     RouteList.periodization: (_) => const PeriodizationPage(),
     RouteList.weeks: (_) => const WeeksPage(),
     RouteList.days: (_) => const DaysPage(),
+    RouteList.workouts: (_) => const WorkoutPage(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
