@@ -1,6 +1,6 @@
 class DayModel {
   final String id;
-  final String weekId;
+  final String weeksId;
   final String title;
   final String? subtitle;
   final DateTime createdAt;
@@ -8,7 +8,7 @@ class DayModel {
 
   DayModel({
     required this.id,
-    required this.weekId,
+    required this.weeksId,
     required this.title,
     this.subtitle,
     required this.createdAt,
@@ -23,7 +23,7 @@ class DayModel {
 
     return DayModel(
       id: data['id'],
-      weekId: data['weekId'],
+      weeksId: data['weeksId'],
       title: data['title'],
       subtitle: data['subtitle'],
       createdAt: data['createdAt'],
@@ -41,7 +41,7 @@ class DayModel {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'weekId': weekId,
+        'weeksId': weeksId,
         'title': title,
         'subtitle': subtitle,
         'createdAt': createdAt,
