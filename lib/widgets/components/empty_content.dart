@@ -9,31 +9,33 @@ class EmptyContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/images/icons/empty-content.png', scale: 0.8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: ThemeColor.white,
+    return Expanded(
+      child: Align(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/icons/empty-content.png', scale: 0.8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: ThemeColor.white,
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            softWrap: true,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
-              color: ThemeColor.white,
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              softWrap: true,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+                color: ThemeColor.white,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
