@@ -96,25 +96,27 @@ class _StartWorkoutState extends State<StartWorkout> {
                   ),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text(
                       'Start Workout',
+                      textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 22, color: ThemeColor.white, fontWeight: FontWeight.w700),
                     ),
+                    const SizedBox(height: 30),
                     (PeriodizationModel.list.isEmpty)
                         ? const EmptyContent(title: "No periodization yet", subtitle: "This content is not available yet")
                         : Align(
+                            heightFactor: 1.5,
                             alignment: Alignment.center,
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: PeriodizationModel.list
                                   .map(
                                     (periodization) => ElevatedButton(
                                       onPressed: () {
                                         PeriodizationModel.current = periodization;
-                                        Navigator.pushNamed(context, RouteList.weeks.name);
+                                        Navigator.pushNamed(context, RouteList.periodization.name);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: ThemeColor.secondary,
