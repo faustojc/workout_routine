@@ -14,8 +14,6 @@ class WeeksPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Periodization'),
-          centerTitle: true,
           backgroundColor: ThemeColor.primary,
           foregroundColor: ThemeColor.white,
           elevation: 0,
