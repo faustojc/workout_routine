@@ -3,9 +3,9 @@ import 'package:workout_routine/themes/colors.dart';
 
 class EmptyContent extends StatelessWidget {
   final String title;
-  final String subtitle;
+  final String? subtitle;
 
-  const EmptyContent({super.key, required this.title, required this.subtitle});
+  const EmptyContent({super.key, required this.title, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class EmptyContent extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              subtitle,
+              subtitle!,
               softWrap: true,
               style: const TextStyle(
                 fontSize: 12,
