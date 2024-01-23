@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_routine/widgets/auth/main_auth.dart';
 import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
+import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
 import 'package:workout_routine/widgets/workouts/days_page.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
@@ -19,6 +20,7 @@ enum RouteList {
   weeks,
   days,
   workouts,
+  personal_record,
 }
 
 extension RouteListExtension on RouteList {
@@ -42,6 +44,8 @@ extension RouteListExtension on RouteList {
         return '/days';
       case RouteList.workouts:
         return '/workouts';
+      case RouteList.personal_record:
+        return '/personal_record';
     }
   }
 }
@@ -58,6 +62,7 @@ class Routes {
     RouteList.weeks: (_) => const WeeksPage(),
     RouteList.days: (_) => const DaysPage(),
     RouteList.workouts: (_) => const WorkoutPage(),
+    RouteList.personal_record: (_) => const PRHome(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
