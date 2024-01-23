@@ -132,7 +132,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz, color: ThemeColor.white))
+                              IconButton(
+                                onPressed: () => Routes.to(context, RouteList.personal_record, 'right'),
+                                icon: const Icon(Icons.more_horiz, color: ThemeColor.white),
+                              )
                             ],
                           ),
                           const SizedBox(height: 5),
