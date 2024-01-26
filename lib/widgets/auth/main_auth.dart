@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/user.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
@@ -18,26 +21,35 @@ class _MainAuthState extends State<MainAuth> {
     LoginForm(key: ValueKey(1)),
     RegisterForm(key: ValueKey(2)),
   ];
+  late StreamSubscription<AuthState> _authState;
+
   int _currentIndex = 0;
+  Session? currSession;
 
   @override
   void initState() {
-    _checkAuth();
-
     super.initState();
+    _authState = _checkAuth();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currSession != null) {
+        Routes.redirectTo(context, RouteList.home);
+      }
+    });
   }
 
-  void _checkAuth() {
-    supabase.auth.onAuthStateChange.listen((data) {
-      final currSession = data.session;
+  @override
+  void dispose() {
+    _authState.cancel();
+    super.dispose();
+  }
 
-      if (currSession != null && mounted) {
+  StreamSubscription<AuthState> _checkAuth() {
+    return supabase.auth.onAuthStateChange.listen((data) {
+      if (data.session != null && mounted) {
+        currSession = data.session;
         session = data.session!;
         user = data.session!.user;
-
-        Routes.redirectTo(context, RouteList.home);
-
-        return;
       }
     });
   }
