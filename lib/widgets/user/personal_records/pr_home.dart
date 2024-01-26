@@ -68,9 +68,7 @@ class _PRHomeState extends State<PRHome> {
                   fontSize: 12,
                   color: ThemeColor.black,
                 )),
-                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(
-                  horizontal: 10,
-                )),
+                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10)),
                 onChanged: (value) {},
               ),
               const SizedBox(height: 20),

@@ -88,7 +88,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    child: Padding(
                       padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -157,9 +156,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  )),
+                      ))),
             );
           }
         }
