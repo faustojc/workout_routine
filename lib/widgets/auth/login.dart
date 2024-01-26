@@ -22,6 +22,14 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   bool _rememberMe = false;
   bool _isLoading = false;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
+  }
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
