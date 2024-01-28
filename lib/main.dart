@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:workout_routine/data/user.dart';
+import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/services/connectivity_service.dart';
 import 'package:workout_routine/themes/colors.dart';
@@ -11,13 +12,7 @@ import 'package:workout_routine/widgets/auth/main_auth.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: 'https://fubkrstvdjgoytlbqjax.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1Ymtyc3R2ZGpnb3l0bGJxamF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDUxMjk1NzAsImV4cCI6MjAyMDcwNTU3MH0.NbDk02y0NwZoQmYUE2Qna9fDnO-R66aaG9tZviDvAkE',
-  );
-
-  supabase = Supabase.instance.client;
+  await PowerSyncConnector.instance.openDatabase().then((value) => supabase = Supabase.instance.client);
 
   runApp(const MainApp());
 }
