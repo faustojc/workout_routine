@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/models/personal_record.dart';
-import 'package:workout_routine/models/personal_record_history.dart';
+import 'package:workout_routine/models/personal_records.dart';
+import 'package:workout_routine/models/personal_records_history.dart';
 import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/themes/colors.dart';
 

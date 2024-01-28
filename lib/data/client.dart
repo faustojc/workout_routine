@@ -21,18 +21,3 @@ final Map<String, dynamic> athleteInfo = {
   'city': '',
   'address': '',
 };
-
-final Map<String, dynamic> avatarInfo = {
-  'url': '',
-  'userId': '',
-};
-
-final Map<String, dynamic> subscriptionInfo = {
-  'athleteId': '',
-  'description': '',
-  'price': '',
-  'duration': '',
-  'type': '',
-  'dateSubscribed': '',
-  'dateExpired': '',
-};

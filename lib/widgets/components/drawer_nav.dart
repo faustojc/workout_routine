@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/data/user.dart';
-import 'package:workout_routine/models/athlete.dart';
-import 'package:workout_routine/models/subscription.dart';
+import 'package:workout_routine/data/client.dart';
+import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/subscriptions.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 
@@ -13,7 +13,6 @@ class DrawerNav extends StatelessWidget {
     return Drawer(
       backgroundColor: ThemeColor.primary,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Close button
@@ -31,7 +30,6 @@ class DrawerNav extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 30, right: 30, bottom: 20),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(

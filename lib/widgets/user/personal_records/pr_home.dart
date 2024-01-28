@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:workout_routine/models/personal_record.dart';
-import 'package:workout_routine/models/personal_record_history.dart';
+import 'package:workout_routine/models/personal_records.dart';
+import 'package:workout_routine/models/personal_records_history.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/empty_content.dart';
 
