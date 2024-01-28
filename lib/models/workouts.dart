@@ -1,4 +1,8 @@
+import 'package:workout_routine/backend/powersync.dart';
+
 class WorkoutModel {
+  static const String table = 'workouts';
+
   final String id;
   final String daysId;
   final String title;
@@ -55,4 +59,43 @@ class WorkoutModel {
         'created_at': createdAt,
         'updated_at': updatedAt,
       };
+
+  static Future<List<WorkoutModel>> getAll() async {
+    final results = await database.getAll("SELECT * FROM $table");
+
+    return fromJsonList(results);
+  }
+
+  static Future<WorkoutModel> getSingle(String id) async {
+    final results = await database.get("SELECT * FROM $table WHERE id = ?", [id]);
+
+    return WorkoutModel.fromJson(results);
+  }
+
+  static Stream<List<WorkoutModel>> watch(String daysId) {
+    return database.watch("SELECT * FROM $table WHERE daysId = $daysId ORDER BY createdAt DESC").map(//
+        (results) => fromJsonList(results) //
+        );
+  }
+
+  static Future<void> create(String daysId, String title, String description, String videoUrl, String thumbnailUrl) async {
+    await database.execute(
+      "INSERT INTO $table (daysId, title, description, video_url, thumbnail_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [daysId, title, description, videoUrl, thumbnailUrl, DateTime.now(), DateTime.now()],
+    );
+  }
+
+  static Future<void> update(String id, String daysId, String title, String description, String videoUrl, String thumbnailUrl) async {
+    await database.execute(
+      "UPDATE $table SET daysId = ?, title = ?, description = ?, video_url = ?, thumbnail_url = ?, updated_at = ? WHERE id = ?",
+      [daysId, title, description, videoUrl, thumbnailUrl, DateTime.now(), id],
+    );
+  }
+
+  static Future<void> delete(String id) async {
+    await database.execute(
+      "DELETE FROM $table WHERE id = ?",
+      [id],
+    );
+  }
 }

@@ -1,4 +1,8 @@
+import 'package:workout_routine/backend/powersync.dart';
+
 class AthleteModel {
+  static const String tableName = "athletes";
+
   final String id;
   final String userId;
   final String? categoryId;
@@ -17,7 +21,6 @@ class AthleteModel {
   AthleteModel({
     required this.id,
     required this.userId,
-    this.categoryId,
     required this.firstName,
     required this.lastName,
     required this.gender,
@@ -29,6 +32,7 @@ class AthleteModel {
     required this.birthday,
     required this.createdAt,
     required this.updatedAt,
+    this.categoryId,
   });
 
   static AthleteModel? current;
@@ -79,4 +83,25 @@ class AthleteModel {
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };
+
+  static Future<void> create(String firstName, String lastName, String gender, String city, String address, int age, num weight, num height, DateTime birthday) async {
+    await database.execute(
+      "INSERT INTO $tableName (firstName, lastName, gender, city, address, age, weight, height, birthday, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [firstName, lastName, gender, city, address, age, weight, height, birthday, DateTime.now()],
+    );
+  }
+
+  static Future<void> update(String id, String firstName, String lastName, String gender, String city, String address, int age, num weight, num height, DateTime birthday) async {
+    await database.execute(
+      "UPDATE $tableName SET firstName = ?, lastName = ?, gender = ?, city = ?, address = ?, age = ?, weight = ?, height = ?, birthday = ?, updatedAt = ? WHERE id = ?",
+      [firstName, lastName, gender, city, address, age, weight, height, birthday, DateTime.now(), id],
+    );
+  }
+
+  static Future<void> delete(String id, String userId) async {
+    await database.execute(
+      "DELETE FROM $tableName WHERE id = ? AND userId = ?",
+      [id, userId],
+    );
+  }
 }

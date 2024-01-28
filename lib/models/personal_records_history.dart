@@ -1,4 +1,8 @@
+import 'package:workout_routine/backend/powersync.dart';
+
 class PRHistoryModel {
+  static const String table = "personal_records_history";
+
   final String id;
   final String prId;
   final String userId;
@@ -45,4 +49,31 @@ class PRHistoryModel {
         'weight': weight,
         'createdAt': createdAt,
       };
+
+  static Stream<List<PRHistoryModel>> watch(String userId) {
+    return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC").map(//
+        (results) => results.map((row) => PRHistoryModel.fromJson(row)).toList() //
+        );
+  }
+
+  static Future<void> create(String prId, String userId, num weight) async {
+    await database.execute(
+      "INSERT INTO $table (prId, userId, weight, createdAt) VALUES (?, ?, ?, ?)",
+      [prId, userId, weight, DateTime.now()],
+    );
+  }
+
+  static Future<void> update(String id, String prId, String userId, num weight) async {
+    await database.execute(
+      "UPDATE $table SET weight = ?, createdAt = ? WHERE id = ? AND prId = ? AND userId = ?",
+      [weight, DateTime.now(), id, prId, userId],
+    );
+  }
+
+  static Future<void> delete(String id, String prId, String userId) async {
+    await database.execute(
+      "DELETE FROM $table WHERE id = ? AND prId = ? AND userId = ?",
+      [id, prId, userId],
+    );
+  }
 }

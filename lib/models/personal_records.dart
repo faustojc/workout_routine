@@ -1,4 +1,8 @@
+import 'package:workout_routine/backend/powersync.dart';
+
 class PersonalRecordModel {
+  static const String table = 'personal_records';
+
   final String id;
   final String userId;
   final String title;
@@ -36,5 +40,32 @@ class PersonalRecordModel {
 
       return PersonalRecordModel.fromJson(data);
     }).toList();
+  }
+
+  static Stream<List<PersonalRecordModel>> watch(String userId) {
+    return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdBy DESC").map(//
+        (results) => results.map((row) => PersonalRecordModel.fromJson(row)).toList() //
+        );
+  }
+
+  static Future<void> create(String userId, String title) async {
+    await database.execute(
+      "INSERT INTO $table (userId, title, createdAt, updatedAt) VALUES (?, ?, ?, ?)",
+      [userId, title, DateTime.now(), DateTime.now()],
+    );
+  }
+
+  static Future<void> update(String id, String userId, String title) async {
+    await database.execute(
+      "UPDATE $table SET title = ?, updatedAt = ? WHERE id = ? AND userId = ?",
+      [title, DateTime.now(), id, userId],
+    );
+  }
+
+  static Future<void> delete(String id, String userId) async {
+    await database.execute(
+      "DELETE FROM $table WHERE id = ? AND userId = ?",
+      [id, userId],
+    );
   }
 }

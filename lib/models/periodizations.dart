@@ -1,4 +1,8 @@
+import 'package:workout_routine/backend/powersync.dart';
+
 class PeriodizationModel {
+  static const String table = "periodizations";
+
   final String id;
   final String name;
   final String? acronym;
@@ -9,10 +13,10 @@ class PeriodizationModel {
   PeriodizationModel({
     required this.id,
     required this.name,
-    this.acronym,
     required this.description,
     required this.createdAt,
     required this.updatedAt,
+    this.acronym,
   });
 
   static PeriodizationModel? current;
@@ -47,4 +51,37 @@ class PeriodizationModel {
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };
+
+  static Future<List<PeriodizationModel>> getAll() async {
+    final results = await database.getAll("SELECT * FROM $table");
+
+    return results.map((row) => PeriodizationModel.fromJson(row)).toList();
+  }
+
+  static Future<PeriodizationModel> getSingle(String id) async {
+    final result = await database.get("SELECT * FROM $table WHERE id = $id");
+
+    return PeriodizationModel.fromJson(result);
+  }
+
+  static Future<void> create(String name, {String? acronym}) async {
+    await database.execute(
+      "INSERT INTO $table (name, acronym, createdAt) VALUES (?, ?, ?)",
+      [name, acronym, DateTime.now()],
+    );
+  }
+
+  static Future<void> update(String id, String name, {String? acronym}) async {
+    await database.execute(
+      "UPDATE $table SET name = ?, acronym = ?, updatedAt = ? WHERE id = ?",
+      [name, acronym, DateTime.now(), id],
+    );
+  }
+
+  static Future<void> delete(String id) async {
+    await database.execute(
+      "DELETE FROM $table WHERE id = ?",
+      [id],
+    );
+  }
 }
