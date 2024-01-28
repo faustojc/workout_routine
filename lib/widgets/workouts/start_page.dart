@@ -107,7 +107,6 @@ class _StartWorkoutState extends State<StartWorkout> {
                         ? const EmptyContent(title: "No periodization yet", subtitle: "This content is not available yet")
                         : Align(
                             heightFactor: 1.5,
-                            alignment: Alignment.center,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.stretch,

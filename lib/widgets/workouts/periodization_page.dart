@@ -56,7 +56,6 @@ class PeriodizationPage extends StatelessWidget {
                     ? const EmptyContent(title: "No weeks yet", subtitle: "This content is not available yet")
                     : Expanded(
                         child: Align(
-                          alignment: Alignment.center,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,

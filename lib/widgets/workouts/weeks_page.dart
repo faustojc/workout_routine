@@ -50,7 +50,6 @@ class WeeksPage extends StatelessWidget {
                     ? const EmptyContent(title: "No days yet", subtitle: "This content is not available yet")
                     : Expanded(
                         child: Align(
-                          alignment: Alignment.center,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
