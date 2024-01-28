@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/data/user.dart';
-import 'package:workout_routine/models/athlete.dart';
-import 'package:workout_routine/models/personal_record.dart';
-import 'package:workout_routine/models/personal_record_history.dart';
-import 'package:workout_routine/models/subscription.dart';
+import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/data/client.dart';
+import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/personal_records.dart';
+import 'package:workout_routine/models/personal_records_history.dart';
+import 'package:workout_routine/models/subscriptions.dart';
 import 'package:workout_routine/models/user_workouts.dart';
 import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
@@ -41,14 +42,27 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Future<Map<String, dynamic>?> _getUserData() async {
     final email = supabase.auth.currentUser!.email;
 
-    final userData = await supabase
-        .from('users') //
-        .select('*, athletes(*), personal_records(*), subscriptions(*), personal_records_history(*), user_workouts(*)')
-        .eq('email', email!)
-        .single();
+    // Fetch user's data first
+    final userData = await database.get("SELECT * FROM users WHERE email = ?", [email]);
 
-    if (userData.isNotEmpty) {
-      return userData;
+    // Fetch other data by using the user's id
+    final athletesData = await database.get("SELECT * FROM athletes WHERE userId = ?", [userData['id']]);
+    final personalRecordsData = await database.get("SELECT * FROM personal_records WHERE userId = ?", [userData['id']]);
+    final subscriptionsData = await database.get("SELECT * FROM subscriptions WHERE userId = ?", [userData['id']]);
+    final personalRecordsHistoryData = await database.get("SELECT * FROM personal_records_history WHERE userId = ?", [userData['id']]);
+    final userWorkoutsData = await database.get("SELECT * FROM user_workouts WHERE userId = ?", [userData['id']]);
+
+    final combinedData = {
+      ...userData,
+      'athletes': athletesData,
+      'personal_records': personalRecordsData,
+      'subscriptions': subscriptionsData,
+      'personal_records_history': personalRecordsHistoryData,
+      'user_workouts': userWorkoutsData,
+    };
+
+    if (combinedData.isNotEmpty) {
+      return combinedData;
     }
 
     return null;
