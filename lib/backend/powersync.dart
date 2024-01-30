@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,15 +19,16 @@ final List<RegExp> fatalResponseCodes = [
 ];
 final log = Logger('powersync-supabase');
 
-late final PowerSyncDatabase database;
+late PowerSyncDatabase database;
 
 const String databaseName = "powersync.db";
 const String powersyncUrl = "https://65b1a8504078d9a211d72c4b.powersync.journeyapps.com";
 
 class PowerSyncConnector extends PowerSyncBackendConnector {
   Future<void>? _refreshFuture;
+  PowerSyncDatabase db;
 
-  static final PowerSyncConnector instance = PowerSyncConnector();
+  PowerSyncConnector(this.db);
 
   @override
   Future<PowerSyncCredentials?> fetchCredentials() async {
@@ -42,13 +42,11 @@ class PowerSyncConnector extends PowerSyncBackendConnector {
 
     final token = session.accessToken;
     final userId = session.user.id;
-    final expiresAt = session.expiresAt == null ? null : DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000);
 
     return PowerSyncCredentials(
       endpoint: powersyncUrl,
       token: token,
       userId: userId,
-      expiresAt: expiresAt,
     );
   }
 
@@ -96,44 +94,50 @@ class PowerSyncConnector extends PowerSyncBackendConnector {
       }
     }
   }
+}
 
-  Future<String> getDatabasePath() async {
-    final dir = await getApplicationSupportDirectory();
+bool isLoggedIn() {
+  return Supabase.instance.client.auth.currentSession?.accessToken != null;
+}
 
-    return join(dir.path, databaseName);
+Future<String> getDatabasePath() async {
+  final dir = await getApplicationSupportDirectory();
+
+  return join(dir.path, databaseName);
+}
+
+Future<void> openDatabase() async {
+  database = PowerSyncDatabase(
+    schema: schema,
+    path: await getDatabasePath(),
+  );
+
+  await database.initialize();
+  await Supabase.initialize(
+    url: 'https://fubkrstvdjgoytlbqjax.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1Ymtyc3R2ZGpnb3l0bGJxamF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDUxMjk1NzAsImV4cCI6MjAyMDcwNTU3MH0.NbDk02y0NwZoQmYUE2Qna9fDnO-R66aaG9tZviDvAkE',
+  );
+
+  supabase = Supabase.instance.client;
+  PowerSyncConnector connector = PowerSyncConnector(database);
+
+  if (isLoggedIn()) {
+    session = supabase.auth.currentSession!;
+    user = supabase.auth.currentUser!;
+
+    connector = PowerSyncConnector(database);
+    await database.connect(connector: connector);
   }
 
-  Future<void> openDatabase() async {
-    database = PowerSyncDatabase(
-      schema: schema,
-      path: await getDatabasePath(),
-    );
-
-    await database.initialize().onError((error, stackTrace) {
-      if (kDebugMode) {
-        print(error);
-      }
-    });
-    await Supabase.initialize(
-      url: 'https://fubkrstvdjgoytlbqjax.supabase.co',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1Ymtyc3R2ZGpnb3l0bGJxamF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDUxMjk1NzAsImV4cCI6MjAyMDcwNTU3MH0.NbDk02y0NwZoQmYUE2Qna9fDnO-R66aaG9tZviDvAkE',
-    );
-
-    bool isLoggedIn = Supabase.instance.client.auth.currentSession?.accessToken != null;
-
-    if (isLoggedIn) {
-      database.connect(connector: this);
-    } else {
-      Supabase.instance.client.auth.onAuthStateChange.listen((state) {
-        if (state.session?.accessToken != null) {
-          database.connect(connector: this);
-        } else if (state.event == AuthChangeEvent.tokenRefreshed) {
-          prefetchCredentials();
-        } else {
-          database.disconnect();
-        }
-      });
+  Supabase.instance.client.auth.onAuthStateChange.listen((state) async {
+    if (state.event == AuthChangeEvent.signedIn) {
+      await database.connect(connector: connector);
+    } else if (state.event == AuthChangeEvent.signedOut) {
+      await database.disconnect();
+    } else if (state.event == AuthChangeEvent.tokenRefreshed) {
+      await connector.prefetchCredentials();
+      await database.connect(connector: connector);
     }
-  }
+  });
 }
