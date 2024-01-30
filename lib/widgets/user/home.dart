@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/backend/powersync.dart';
-import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/models/personal_records.dart';
-import 'package:workout_routine/models/personal_records_history.dart';
-import 'package:workout_routine/models/subscriptions.dart';
-import 'package:workout_routine/models/user_workouts.dart';
-import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
-import 'package:workout_routine/widgets/components/drawer_nav.dart';
-import 'package:workout_routine/widgets/components/loading.dart';
 import 'package:workout_routine/widgets/components/personal_records_grid.dart';
 import 'package:workout_routine/widgets/components/recent_workout.dart';
 
@@ -21,162 +12,138 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  late Future<Map<String, dynamic>?> _fetchData;
+class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+  double _indicatorLeft = 0.0;
 
-  @override
-  void initState() {
-    super.initState();
-
-    _fetchData = _getUserData();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
-
-  Future<Map<String, dynamic>?> _getUserData() async {
-    final email = supabase.auth.currentUser!.email;
-
-    // Fetch user's data first
-    final userData = await database.get("SELECT * FROM users WHERE email = ?", [email]);
-
-    // Fetch other data by using the user's id
-    final athletesData = await database.get("SELECT * FROM athletes WHERE userId = ?", [userData['id']]);
-    final personalRecordsData = await database.get("SELECT * FROM personal_records WHERE userId = ?", [userData['id']]);
-    final subscriptionsData = await database.get("SELECT * FROM subscriptions WHERE userId = ?", [userData['id']]);
-    final personalRecordsHistoryData = await database.get("SELECT * FROM personal_records_history WHERE userId = ?", [userData['id']]);
-    final userWorkoutsData = await database.get("SELECT * FROM user_workouts WHERE userId = ?", [userData['id']]);
-
-    final combinedData = {
-      ...userData,
-      'athletes': athletesData,
-      'personal_records': personalRecordsData,
-      'subscriptions': subscriptionsData,
-      'personal_records_history': personalRecordsHistoryData,
-      'user_workouts': userWorkoutsData,
-    };
-
-    if (combinedData.isNotEmpty) {
-      return combinedData;
-    }
-
-    return null;
+  void _setIndex(int value, double itemWidth) {
+    setState(() {
+      _currentIndex = value;
+      _indicatorLeft = ((_currentIndex == 2 || _currentIndex == 3) ? (_currentIndex + 1) : _currentIndex) * itemWidth;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _fetchData,
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            final data = snapshot.data!;
+    double itemWidth = MediaQuery.of(context).size.width / 5;
 
-            UserModel.current = UserModel.fromJson(data);
-            AthleteModel.current = AthleteModel.fromJson(data['athletes'][0]);
-            SubscriptionModel.current = SubscriptionModel.fromJson(data['subscriptions'][0]);
-
-            PersonalRecordModel.list = PersonalRecordModel.fromList(data['personal_records']);
-            PRHistoryModel.list = PRHistoryModel.fromList(data['personal_records_history']);
-            UserWorkoutModel.list = UserWorkoutModel.fromList(data['user_workouts']);
-
-            return Scaffold(
-              resizeToAvoidBottomInset: true,
-              appBar: AppBar(
-                backgroundColor: ThemeColor.primary,
-                foregroundColor: ThemeColor.white,
-                elevation: 0,
-              ),
-              drawer: const DrawerNav(),
-              body: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [ThemeColor.primary, ThemeColor.secondary],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: ThemeColor.primary,
+        resizeToAvoidBottomInset: true,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => Routes.to(context, RouteList.startWorkout, 'right'),
+          elevation: 4,
+          backgroundColor: ThemeColor.accent,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.fitness_center, color: ThemeColor.primary),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Stack(
+          children: [
+            BottomAppBar(
+              shape: const CircularNotchedRectangle(),
+              elevation: 2,
+              height: 60,
+              color: ThemeColor.secondary,
+              surfaceTintColor: ThemeColor.black,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () => _setIndex(0, itemWidth),
+                    icon: Icon(Icons.home, color: _currentIndex == 0 ? ThemeColor.accent : ThemeColor.black),
                   ),
-                  child: SingleChildScrollView(
-                      padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          ListTile(
-                            title: const Text(
-                              'WELCOME,',
-                              style: TextStyle(color: ThemeColor.tertiary, fontSize: 12),
-                            ),
-                            subtitle: Text(
-                              AthleteModel.current!.firstName.toUpperCase(),
-                              style: const TextStyle(
-                                color: ThemeColor.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                            trailing: CircleAvatar(
-                              backgroundColor: ThemeColor.white,
-                              child: Text(
-                                AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
-                                style: const TextStyle(
-                                  color: ThemeColor.secondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                  IconButton(
+                    onPressed: () => _setIndex(1, itemWidth),
+                    icon: Icon(Icons.history, color: _currentIndex == 1 ? ThemeColor.accent : ThemeColor.black),
+                  ),
+                  const SizedBox(width: 42),
+                  IconButton(
+                    onPressed: () => _setIndex(2, itemWidth),
+                    icon: Icon(Icons.notifications, color: _currentIndex == 2 ? ThemeColor.accent : ThemeColor.black),
+                  ),
+                  IconButton(
+                    onPressed: () => _setIndex(3, itemWidth),
+                    icon: Icon(Icons.person, color: _currentIndex == 3 ? ThemeColor.accent : ThemeColor.black),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              bottom: 0,
+              left: _indicatorLeft,
+              child: Container(
+                width: itemWidth,
+                height: 4,
+                decoration: const BoxDecoration(
+                  color: ThemeColor.accent,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: Container(
+            height: MediaQuery.of(context).size.height,
+            color: ThemeColor.primary,
+            child: SingleChildScrollView(
+                padding: const EdgeInsets.only(right: 15, left: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListTile(
+                      title: const Text(
+                        'WELCOME,',
+                        style: TextStyle(color: ThemeColor.tertiary, fontSize: 12),
+                      ),
+                      subtitle: Text(
+                        AthleteModel.current!.firstName.toUpperCase(),
+                        style: const TextStyle(
+                          color: ThemeColor.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      trailing: CircleAvatar(
+                        backgroundColor: ThemeColor.white,
+                        child: Text(
+                          AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                          style: const TextStyle(
+                            color: ThemeColor.secondary,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 15),
-                          const RecentWorkout(),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'PERSONAL RECORDS',
-                                style: TextStyle(
-                                  color: ThemeColor.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => Routes.to(context, RouteList.personal_record, 'right'),
-                                icon: const Icon(Icons.more_horiz, color: ThemeColor.white),
-                              )
-                            ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    const RecentWorkout(),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'PERSONAL RECORDS',
+                          style: TextStyle(
+                            color: ThemeColor.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(height: 5),
-                          const PersonalRecordsGrid(),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () => Routes.to(context, RouteList.startWorkout, 'right'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ThemeColor.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                            ),
-                            child: const Text(
-                              'Start Workout',
-                              textScaler: TextScaler.linear(1.2),
-                              style: TextStyle(color: ThemeColor.white),
-                            ),
-                          ),
-                        ],
-                      ))),
-            );
-          }
-        }
-
-        return const Loading();
-      },
+                        ),
+                        IconButton(
+                          onPressed: () => Routes.to(context, RouteList.personal_record, 'right'),
+                          icon: const Icon(Icons.more_horiz, color: ThemeColor.white),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    const PersonalRecordsGrid(),
+                  ],
+                ))),
+      ),
     );
   }
 }
