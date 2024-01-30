@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
@@ -68,12 +67,17 @@ class _RegisterFormState extends State<RegisterForm> {
         session = response.session!;
         user = response.user!;
 
-        final userData = await supabase.from('users').insert(userInfo).single();
-        UserModel.current = UserModel.fromJson(userData);
-        athleteInfo['userId'] = UserModel.current?.id;
-
-        final athleteData = await supabase.from('athletes').insert(athleteInfo).single();
-        AthleteModel.current = AthleteModel.fromJson(athleteData);
+        await AthleteModel.create(
+          athleteInfo['firstname'],
+          athleteInfo['lastname'],
+          athleteInfo['gender'],
+          athleteInfo['city'],
+          athleteInfo['address'],
+          athleteInfo['age'],
+          athleteInfo['weight'],
+          athleteInfo['height'],
+          athleteInfo['birthday'],
+        );
 
         setState(() {
           _currentStatusText = 'Registration successful! Email confirmation was sent to ${userInfo['email']} to verify your account.';
