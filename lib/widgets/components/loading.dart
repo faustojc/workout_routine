@@ -34,13 +34,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   Widget splashScreen(BuildContext context) => Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [ThemeColor.primary, ThemeColor.tertiary],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: ThemeColor.primary,
         child: Center(
           child: FadeTransition(
             opacity: _animation,
