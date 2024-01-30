@@ -49,8 +49,8 @@ const schema = Schema([
     Column.text('city'),
     Column.text('address'),
     Column.text('birthday'),
-    Column.text('userId'),
-    Column.integer('age')
+    Column.integer('age'),
+    Column.text('userId')
   ]),
   Table('category', [
     Column.text('created_at'),
@@ -65,10 +65,10 @@ const schema = Schema([
     Column.text('userId'),
   ]),
   Table('personal_records_history', [
-    Column.text('userId'),
     Column.text('prId'),
     Column.real('weight'),
     Column.text('createdAt'),
+    Column.text('userId'),
   ]),
   Table('user_workouts', [
     Column.text('userId'),
@@ -82,7 +82,7 @@ const schema = Schema([
     Column.text('duration'),
     Column.text('dateSubscribed'),
     Column.text('dateExpired'),
-    Column.text('userId'),
     Column.integer('isSubscribed'),
+    Column.text('userId'),
   ])
 ]);
