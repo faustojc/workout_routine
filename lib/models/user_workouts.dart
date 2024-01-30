@@ -54,6 +54,18 @@ class UserWorkoutModel {
         'updatedAt': updatedAt,
       };
 
+  static Future<List<UserWorkoutModel>> getAllByUserId(String userId) async {
+    final results = await database.getAll("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
+
+    return UserWorkoutModel.fromList(results);
+  }
+
+  static Future<UserWorkoutModel> getSingle(String id, String userId) async {
+    final results = await database.get("SELECT * FROM $table WHERE id = ? AND userId = ?", [id, userId]);
+
+    return UserWorkoutModel.fromJson(results);
+  }
+
   static Stream<List<UserWorkoutModel>> watch(String userId) {
     return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC").map(//
         (results) => results.map((row) => UserWorkoutModel.fromJson(row)).toList() //

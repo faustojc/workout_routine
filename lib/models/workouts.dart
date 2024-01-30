@@ -72,6 +72,12 @@ class WorkoutModel {
     return WorkoutModel.fromJson(results);
   }
 
+  static Future<List<WorkoutModel>> getAllByDaysId(String daysId) async {
+    final results = await database.getAll("SELECT * FROM $table WHERE daysId = ? ORDER BY createdAt DESC", [daysId]);
+
+    return fromJsonList(results);
+  }
+
   static Stream<List<WorkoutModel>> watch(String daysId) {
     return database.watch("SELECT * FROM $table WHERE daysId = $daysId ORDER BY createdAt DESC").map(//
         (results) => fromJsonList(results) //

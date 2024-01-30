@@ -84,6 +84,24 @@ class AthleteModel {
         'updatedAt': updatedAt,
       };
 
+  static Future<AthleteModel> getSingle(String id) async {
+    final results = await database.get("SELECT * FROM $tableName WHERE id = ?", [id]);
+
+    return AthleteModel.fromJson(results);
+  }
+
+  static Future<AthleteModel> getByUserId(String userId) async {
+    final results = await database.get("SELECT * FROM $tableName WHERE userId = ?", [userId]);
+
+    return AthleteModel.fromJson(results);
+  }
+
+  static Stream<List<AthleteModel>> watch(String userId) {
+    return database.watch("SELECT * FROM $tableName WHERE userId = ? ORDER BY createdAt DESC", parameters: [userId]).map(//
+        (results) => results.map((row) => AthleteModel.fromJson(row)).toList() //
+        );
+  }
+
   static Future<void> create(String firstName, String lastName, String gender, String city, String address, int age, num weight, num height, DateTime birthday) async {
     await database.execute(
       "INSERT INTO $tableName (firstName, lastName, gender, city, address, age, weight, height, birthday, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",

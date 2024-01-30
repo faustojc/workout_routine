@@ -42,6 +42,20 @@ class PersonalRecordModel {
     }).toList();
   }
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'userId': userId,
+        'title': title,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+      };
+
+  static Future<List<PersonalRecordModel>> getAllByUserId(String userId) async {
+    final results = await database.getAll("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
+
+    return PersonalRecordModel.fromList(results);
+  }
+
   static Stream<List<PersonalRecordModel>> watch(String userId) {
     return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdBy DESC").map(//
         (results) => results.map((row) => PersonalRecordModel.fromJson(row)).toList() //

@@ -25,6 +25,10 @@ class SubscriptionModel {
 
   factory SubscriptionModel.fromJson(Map<dynamic, dynamic> json) {
     final data = json.map((key, value) {
+      if (key == 'isSubscribed' && value is int) {
+        return MapEntry(key, value == 1 ? true : false);
+      }
+
       if ((key == 'dateSubscribed' && value != null) || (key == 'dateExpired' && value != null)) {
         return MapEntry(key, DateTime.parse(value));
       } else {
@@ -55,6 +59,12 @@ class SubscriptionModel {
 
   static Future<SubscriptionModel> getSingle(String id, String userId) async {
     final results = await database.get("SELECT * FROM $table WHERE id = ? AND userId = ?", [id, userId]);
+
+    return SubscriptionModel.fromJson(results);
+  }
+
+  static Future<SubscriptionModel> getSingleByUserId(String userId) async {
+    final results = await database.get("SELECT * FROM $table WHERE userId = ?", [userId]);
 
     return SubscriptionModel.fromJson(results);
   }

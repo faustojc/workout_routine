@@ -50,6 +50,18 @@ class PRHistoryModel {
         'createdAt': createdAt,
       };
 
+  static Future<List<PRHistoryModel>> getAllByUserId(String userId) async {
+    final results = await database.getAll("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
+
+    return PRHistoryModel.fromList(results);
+  }
+
+  static Future<PRHistoryModel> getSingle(String id, String prId, String userId) async {
+    final results = await database.get("SELECT * FROM $table WHERE id = ? AND prId = ? AND userId = ?", [id, prId, userId]);
+
+    return PRHistoryModel.fromJson(results);
+  }
+
   static Stream<List<PRHistoryModel>> watch(String userId) {
     return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC").map(//
         (results) => results.map((row) => PRHistoryModel.fromJson(row)).toList() //
