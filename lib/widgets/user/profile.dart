@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/models/subscriptions.dart';
-import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/tile_field.dart';
@@ -9,7 +9,8 @@ import 'package:workout_routine/widgets/components/tile_field.dart';
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
-  String _dateFormatter(DateTime date) {
+  String _dateFormatter(String value) {
+    final date = DateTime.parse(value);
     final String month = date.month.toString().padLeft(2, '0');
     final String day = date.day.toString().padLeft(2, '0');
     final String year = date.year.toString();
@@ -114,15 +115,15 @@ class Profile extends StatelessWidget {
                           TileField(leading: 'First Name', title: AthleteModel.current!.firstName),
                           TileField(leading: 'Last Name', title: AthleteModel.current!.lastName),
                           TileField(leading: 'Gender', title: AthleteModel.current!.gender),
-                          TileField(leading: 'Birthdate', title: _dateFormatter(AthleteModel.current!.birthday)),
+                          TileField(leading: 'Birthdate', title: _dateFormatter(AthleteModel.current!.birthday.millisecondsSinceEpoch.toString())),
                           TileField(leading: 'Age', title: AthleteModel.current!.age.toString()),
                           TileField(leading: 'Height', title: AthleteModel.current!.weight.toString()),
                           TileField(leading: 'Weight', title: AthleteModel.current!.height.toString()),
                           TileField(leading: 'City', title: AthleteModel.current!.city),
                           TileField(leading: 'Address', title: AthleteModel.current!.address),
-                          TileField(leading: 'Email', title: UserModel.current!.email),
+                          TileField(leading: 'Email', title: user.email!),
                           const SizedBox(height: 30),
-                          Text('Joined ${_dateFormatter(UserModel.current!.createdAt)}',
+                          Text('Joined ${_dateFormatter(user.createdAt!)}',
                               style: const TextStyle(
                                 color: ThemeColor.tertiary,
                                 fontSize: 10,

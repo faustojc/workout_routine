@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/personal_records.dart';
 import 'package:workout_routine/models/personal_records_history.dart';
-import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/themes/colors.dart';
 
 class PersonalRecordsGrid extends StatefulWidget {
@@ -83,7 +83,7 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
       shrinkWrap: true,
       mainAxisSpacing: 2,
       crossAxisSpacing: 2,
-      children: PersonalRecordModel.list.where((record) => record.userId == UserModel.current!.id).map((record) {
+      children: PersonalRecordModel.list.where((record) => record.userId == user.id).map((record) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           constraints: (_personalRecordsCount == 1) ? const BoxConstraints(maxHeight: 350, maxWidth: 350) : const BoxConstraints(maxHeight: 200, maxWidth: 200),

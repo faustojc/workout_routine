@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/models/users.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
@@ -62,7 +60,7 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
 
-    _emailController = TextEditingController(text: UserModel.current!.email);
+    _emailController = TextEditingController(text: user.email);
     _firstNameController = TextEditingController(text: AthleteModel.current!.firstName);
     _lastNameController = TextEditingController(text: AthleteModel.current!.lastName);
     _genderController = TextEditingController(text: AthleteModel.current!.gender);
@@ -150,15 +148,7 @@ class _EditProfileState extends State<EditProfile> {
 
       _overlayPortalController.show();
 
-      if (athleteInfo['email'].toString().isNotEmpty) {
-        UserAttributes attributes = UserAttributes(email: athleteInfo['email'].toString());
-
-        await supabase.auth.updateUser(attributes);
-        await supabase.from('users').update({
-          'email': athleteInfo['email'],
-          'updatedAt': DateTime.now().microsecondsSinceEpoch,
-        }).eq('id', UserModel.current!.id);
-      }
+      // TODO: Update user info to powersync
 
       supabase.from('athletes').update(athleteInfo).eq('id', AthleteModel.current!.id).then((value) {
         AthleteModel.current = AthleteModel.fromJson(value);
