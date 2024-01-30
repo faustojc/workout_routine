@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/days.dart';
 import 'package:workout_routine/models/periodizations.dart';
 import 'package:workout_routine/models/weeks.dart';
@@ -18,7 +17,7 @@ class StartWorkout extends StatefulWidget {
 }
 
 class _StartWorkoutState extends State<StartWorkout> {
-  late Future<Map<String, List<Map<String, dynamic>>>?> _fetchWorkoutData;
+  late Future<Map<String, dynamic>?> _fetchWorkoutData;
 
   @override
   void initState() {
@@ -27,20 +26,20 @@ class _StartWorkoutState extends State<StartWorkout> {
     super.initState();
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>?> _getWorkoutData() async {
-    final Map<String, List<Map<String, dynamic>>> data = {};
+  Future<Map<String, dynamic>?> _getWorkoutData() async {
+    final periodizations = await PeriodizationModel.getAll();
+    final weeks = await WeekModel.getAll();
+    final days = await DayModel.getAll();
+    final workouts = await WorkoutModel.getAll();
+    final workoutParameters = await WorkoutParameterModel.getAll();
 
-    final periodizations = await supabase.from('periodizations').select();
-    final weeks = await supabase.from('weeks').select();
-    final days = await supabase.from('days').select();
-    final workouts = await supabase.from('workouts').select('*, workout_parameters(*)');
-
-    data.addAll({
+    final data = {
       'periodizations': periodizations,
       'weeks': weeks,
       'days': days,
       'workouts': workouts,
-    });
+      'workout_parameters': workoutParameters,
+    };
 
     if (data.map((key, value) => MapEntry(key, value)).isNotEmpty) {
       return data;
@@ -58,11 +57,13 @@ class _StartWorkoutState extends State<StartWorkout> {
             return const Loading();
           } else {
             if (snapshot.hasData) {
-              PeriodizationModel.list = snapshot.data!['periodizations']!.map((periodization) => PeriodizationModel.fromJson(periodization)).toList();
-              WeekModel.list = snapshot.data!['weeks']!.map((week) => WeekModel.fromJson(week)).toList();
-              DayModel.list = snapshot.data!['days']!.map((day) => DayModel.fromJson(day)).toList();
-              WorkoutModel.list = snapshot.data!['workouts']!.map((workout) => WorkoutModel.fromJson(workout)).toList();
-              WorkoutParameterModel.list = snapshot.data!['workouts']!.map((workout) => WorkoutParameterModel.fromJson(workout['workout_parameters'])).toList();
+              final data = snapshot.data!;
+
+              PeriodizationModel.list = data['periodizations'];
+              WeekModel.list = data['weeks'];
+              DayModel.list = data['days'];
+              WorkoutModel.list = data['workouts'];
+              WorkoutParameterModel.list = data['workout_parameters'];
             }
 
             return Scaffold(
