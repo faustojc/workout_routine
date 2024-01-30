@@ -2,17 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/backend/powersync.dart';
-import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/services/connectivity_service.dart';
 import 'package:workout_routine/themes/colors.dart';
-import 'package:workout_routine/widgets/auth/main_auth.dart';
+import 'package:workout_routine/widgets/components/splash_screen_loading.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await PowerSyncConnector.instance.openDatabase().then((value) => supabase = Supabase.instance.client);
+  await openDatabase();
 
   runApp(const MainApp());
 }
@@ -34,7 +32,7 @@ class MainApp extends StatelessWidget {
         ),
         onGenerateRoute: Routes.generateRoute,
         debugShowCheckedModeBanner: false,
-        home: const MainAuth(),
+        home: const SplashScreenLoading(),
       ),
     );
   }
