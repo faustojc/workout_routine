@@ -27,7 +27,6 @@ class MainApp extends StatelessWidget {
         title: 'Strength and Conditioning',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
-          fontFamily: 'SpaceGrotesk',
           useMaterial3: true,
         ),
         onGenerateRoute: Routes.generateRoute,
