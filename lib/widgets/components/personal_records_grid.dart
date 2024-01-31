@@ -81,8 +81,8 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
       crossAxisCount: _personalRecordsCount,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      mainAxisSpacing: 2,
-      crossAxisSpacing: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
       children: PersonalRecordModel.list.where((record) => record.userId == user.id).map((record) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -100,8 +100,9 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
                 children: [
                   Text(
                     record.title,
+                    overflow: TextOverflow.fade,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -113,7 +114,7 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
                   Text(
                     _getRecentPRHistory(record.id).weight.toString(),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -123,11 +124,11 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
                     children: [
                       Text(
                         _dateFormatter(_getRecentPRHistory(record.id).createdAt),
-                        style: const TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 15),
                       ),
                       const Text(
                         'lbs',
-                        style: TextStyle(fontSize: 10),
+                        style: TextStyle(fontSize: 15),
                       ),
                     ],
                   )
