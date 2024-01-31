@@ -126,7 +126,6 @@ Future<void> openDatabase() async {
     session = supabase.auth.currentSession!;
     user = supabase.auth.currentUser!;
 
-    connector = PowerSyncConnector(database);
     await database.connect(connector: connector);
   }
 
@@ -137,7 +136,6 @@ Future<void> openDatabase() async {
       await database.disconnect();
     } else if (state.event == AuthChangeEvent.tokenRefreshed) {
       await connector.prefetchCredentials();
-      await database.connect(connector: connector);
     }
   });
 }
