@@ -139,7 +139,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                 controller: _emailController,
                 validator: _validateEmail,
                 icon: Icons.email_outlined,
-                decoration: FieldDecoration.outlined,
               ),
               const SizedBox(height: 20),
               const Text(
@@ -157,7 +156,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                 controller: _passwordController,
                 validator: _validatePassword,
                 icon: Icons.lock_outline,
-                decoration: FieldDecoration.outlined,
               ),
               const SizedBox(height: 20),
               Row(
