@@ -4,6 +4,7 @@ import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/services/connectivity_service.dart';
 import 'package:workout_routine/themes/colors.dart';
+import 'package:workout_routine/widgets/components/notification_listview.dart';
 import 'package:workout_routine/widgets/components/personal_records_grid.dart';
 import 'package:workout_routine/widgets/components/recent_workout.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
@@ -169,6 +170,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ],
                     )),
                 const PRHome(),
+                const NotificationListView(),
               ],
             )),
       ),
