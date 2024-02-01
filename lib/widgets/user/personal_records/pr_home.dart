@@ -15,7 +15,6 @@ class PRHome extends StatefulWidget {
 class _PRHomeState extends State<PRHome> {
   final List<PersonalRecordModel> _pr = PersonalRecordModel.list;
   final List<PRHistoryModel> _prHistory = PRHistoryModel.list;
-  final ScrollController _scrollController = ScrollController();
 
   String _dateFormat(DateTime date) {
     return DateFormat.yMMMMd('en_US').format(date);
