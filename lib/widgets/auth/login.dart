@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:workout_routine/backend/powersync.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/models/personal_records.dart';
@@ -24,7 +23,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _rememberMe = false;
   bool _isLoading = false;
 
   @override
@@ -55,12 +53,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     return null;
   }
 
-  void onChanged(bool? value) {
-    setState(() {
-      _rememberMe = value!;
-    });
-  }
-
   Future<void> _login(context) async {
     if (_formKey.currentState!.validate()) {
       // Perform login action
@@ -70,8 +62,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         session = response.session!;
         user = response.user!;
 
-        PowerSyncConnector connector = PowerSyncConnector(database);
-        await database.connect(connector: connector);
+        // PowerSyncConnector connector = PowerSyncConnector(database);
+        // await database.connect(connector: connector);
 
         await _fetchData();
 
@@ -158,41 +150,17 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                 icon: Icons.lock_outline,
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: onChanged,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                        side: const BorderSide(color: ThemeColor.primary),
-                        activeColor: ThemeColor.primary,
-                      ),
-                      const Text(
-                        'Remember me',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: ThemeColor.primary,
-                        ),
-                      ),
-                    ],
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, 0),
+                  textStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: ThemeColor.primary,
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(0, 0),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: ThemeColor.primary,
-                      ),
-                    ),
-                    child: const Text('Forgot password?'),
-                  ),
-                ],
+                ),
+                child: const Text('Forgot password?'),
               ),
               const SizedBox(height: 40),
               ConstrainedBox(
