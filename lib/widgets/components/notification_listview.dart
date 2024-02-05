@@ -28,21 +28,6 @@ class _NotificationListViewState extends State<NotificationListView> {
               ),
             ),
             const SizedBox(height: 20),
-            SearchBar(
-              hintText: 'Search notifications',
-              leading: const Icon(Icons.search),
-              constraints: const BoxConstraints(
-                minHeight: 50,
-                maxHeight: 50,
-              ),
-              textStyle: MaterialStateProperty.all(const TextStyle(
-                fontSize: 12,
-                color: ThemeColor.black,
-              )),
-              padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10)),
-              onChanged: (value) {},
-            ),
-            const SizedBox(height: 20),
             (NotificationModel.list.isEmpty)
                 ? const EmptyContent(title: "No notifications as of the moment", icon: Icons.notifications_off)
                 : Expanded(
