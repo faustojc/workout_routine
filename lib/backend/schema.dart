@@ -84,5 +84,11 @@ const schema = Schema([
     Column.text('dateExpired'),
     Column.integer('isSubscribed'),
     Column.text('userId'),
-  ])
+  ]),
+  Table('notifications', [
+    Column.text('userId'),
+    Column.text('message'),
+    Column.integer('isRead'),
+    Column.text('created_at'),
+  ]),
 ]);
