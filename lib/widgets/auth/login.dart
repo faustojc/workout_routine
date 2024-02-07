@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:workout_routine/backend/powersync.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/models/personal_records.dart';
@@ -62,8 +63,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         session = response.session!;
         user = response.user!;
 
-        // PowerSyncConnector connector = PowerSyncConnector(database);
-        // await database.connect(connector: connector);
+        PowerSyncConnector connector = PowerSyncConnector(database);
+        await database.connect(connector: connector);
 
         await _fetchData();
 
@@ -73,6 +74,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       }).onError((AuthException error, _) {
         showToast(context: context, message: error.message, type: ToastType.error, vsync: this);
       }).whenComplete(() => setState(() => _isLoading = false));
+
+      return;
     }
   }
 
@@ -86,99 +89,129 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(30),
-        topRight: Radius.circular(30),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+  Widget build(BuildContext context) => Scaffold(
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: ThemeColor.primary,
+          padding: const EdgeInsets.all(20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                'Login to Your Account',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColor.primary,
-                ),
-              ),
-              const Text(
-                'Make sure that you already have an account',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                  color: ThemeColor.primary,
-                ),
-              ),
-              const SizedBox(height: 40),
-              const Text(
-                'Email',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColor.primary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              InputFormField(
-                type: FieldType.text,
-                hint: 'Enter your email',
-                controller: _emailController,
-                validator: _validateEmail,
-                icon: Icons.email_outlined,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Password',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColor.primary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              InputFormField(
-                type: FieldType.password,
-                hint: 'Enter your password',
-                controller: _passwordController,
-                validator: _validatePassword,
-                icon: Icons.lock_outline,
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 0),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: ThemeColor.primary,
+            children: [
+              FractionallySizedBox(
+                heightFactor: 0.5,
+                child: Container(
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/backgrounds/login_bg.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
+                              ),
+                            ),
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: ThemeColor.white,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Container(
+                            color: Colors.transparent,
+                            child: TextButton(
+                              onPressed: () => Routes.to(context, RouteList.register, 'right'),
+                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                              child: const Text(
+                                'Register',
+                                style: TextStyle(
+                                  color: ThemeColor.white,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Image.asset('assets/images/icons/s&c-logo-bw.png', width: 100, height: 100),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: const Text('Forgot password?'),
               ),
-              const SizedBox(height: 40),
-              ConstrainedBox(
-                constraints: const BoxConstraints.tightFor(width: double.infinity, height: 55),
-                child: OutlinedButton(
-                  onPressed: _isLoading ? null : () => _login(context),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: ThemeColor.white,
-                    backgroundColor: ThemeColor.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                  ),
-                  child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
-                ),
-              ),
+              FractionallySizedBox(
+                  heightFactor: 0.5,
+                  child: Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            InputFormField(
+                              controller: _emailController,
+                              type: FieldType.text,
+                              decoration: FieldDecoration.filled,
+                              label: 'Email',
+                              validator: _validateEmail,
+                              fillColor: Colors.transparent,
+                            ),
+                            InputFormField(
+                              controller: _passwordController,
+                              type: FieldType.password,
+                              decoration: FieldDecoration.filled,
+                              label: 'Password',
+                              validator: _validatePassword,
+                              fillColor: Colors.transparent,
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                'Forgot Password?',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => _login(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ThemeColor.tertiary,
+                                padding: const EdgeInsets.all(15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(ThemeColor.white)) //
+                                  : const Text('Login'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ))
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
 }
