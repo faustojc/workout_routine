@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/widgets/auth/main_auth.dart';
+import 'package:workout_routine/widgets/auth/login.dart';
+import 'package:workout_routine/widgets/auth/register.dart';
 import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
+import 'package:workout_routine/widgets/user/profile/measure_units.dart';
 import 'package:workout_routine/widgets/workouts/days_page.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
 import 'package:workout_routine/widgets/workouts/start_page.dart';
@@ -12,7 +14,8 @@ import 'package:workout_routine/widgets/workouts/workout_page.dart';
 
 enum RouteList {
   home,
-  auth,
+  login,
+  register,
   profile,
   editProfile,
   startWorkout,
@@ -21,6 +24,7 @@ enum RouteList {
   days,
   workouts,
   personal_record,
+  measureUnits,
 }
 
 extension RouteListExtension on RouteList {
@@ -28,8 +32,10 @@ extension RouteListExtension on RouteList {
     switch (this) {
       case RouteList.home:
         return '/home';
-      case RouteList.auth:
-        return '/auth';
+      case RouteList.login:
+        return '/login';
+      case RouteList.register:
+        return '/register';
       case RouteList.profile:
         return '/profile';
       case RouteList.editProfile:
@@ -46,6 +52,8 @@ extension RouteListExtension on RouteList {
         return '/workouts';
       case RouteList.personal_record:
         return '/personal_record';
+      case RouteList.measureUnits:
+        return '/measure_units';
     }
   }
 }
@@ -54,7 +62,8 @@ class Routes {
   // List of routes
   static final Map<RouteList, WidgetBuilder> _routes = {
     RouteList.home: (_) => const Home(),
-    RouteList.auth: (_) => const MainAuth(),
+    RouteList.login: (_) => const LoginForm(),
+    RouteList.register: (_) => const RegisterForm(),
     RouteList.profile: (_) => const Profile(),
     RouteList.editProfile: (_) => const EditProfile(),
     RouteList.startWorkout: (_) => const StartWorkout(),
@@ -63,6 +72,7 @@ class Routes {
     RouteList.days: (_) => const DaysPage(),
     RouteList.workouts: (_) => const WorkoutPage(),
     RouteList.personal_record: (_) => const PRHome(),
+    RouteList.measureUnits: (_) => const MeasureUnits(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
