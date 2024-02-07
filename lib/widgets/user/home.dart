@@ -9,6 +9,7 @@ import 'package:workout_routine/widgets/components/personal_records_grid.dart';
 import 'package:workout_routine/widgets/components/recent_workout.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
+import 'package:workout_routine/widgets/user/profile/profile_menu.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,10 +19,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
+  late TabController _tabController;
   late ConnectivityService _connectionStatus;
   int _currentIndex = 0;
-  double _indicatorLeft = 0.0;
 
   @override
   void initState() {
@@ -33,12 +33,27 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         showToast(context: context, message: "No connection", type: ToastType.info, vsync: this);
       }
     });
+
+    _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(() {
+      _currentIndex = _tabController.index;
+
+      if (_tabController.index == 2) {
+        _tabController.index = _tabController.previousIndex;
+      }
+    });
   }
 
-  void _setIndex(int value, double itemWidth) {
+  @override
+  void dispose() {
+    _tabController.dispose();
+
+    super.dispose();
+  }
+
+  void _setPage(int value, double itemWidth) {
     setState(() {
       _currentIndex = value;
-      _indicatorLeft = ((_currentIndex == 2 || _currentIndex == 3) ? (_currentIndex + 1) : _currentIndex) * itemWidth;
     });
   }
 
@@ -58,71 +73,32 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           child: const Icon(Icons.fitness_center, color: ThemeColor.primary),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: Stack(
-          children: [
-            BottomAppBar(
-              shape: const CircularNotchedRectangle(),
-              elevation: 2,
-              height: 60,
-              color: ThemeColor.secondary,
-              surfaceTintColor: ThemeColor.black,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      _setIndex(0, itemWidth);
-                      _pageController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-                    },
-                    icon: Icon(Icons.home, color: _currentIndex == 0 ? ThemeColor.accent : ThemeColor.black),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _setIndex(1, itemWidth);
-                      _pageController.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-                    },
-                    icon: Icon(Icons.history, color: _currentIndex == 1 ? ThemeColor.accent : ThemeColor.black),
-                  ),
-                  const SizedBox(width: 42),
-                  IconButton(
-                    onPressed: () {
-                      _setIndex(2, itemWidth);
-                      _pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-                    },
-                    icon: Icon(Icons.notifications, color: _currentIndex == 2 ? ThemeColor.accent : ThemeColor.black),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _setIndex(3, itemWidth);
-                      _pageController.animateToPage(3, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-                    },
-                    icon: Icon(Icons.person, color: _currentIndex == 3 ? ThemeColor.accent : ThemeColor.black),
-                  ),
-                ],
-              ),
-            ),
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              bottom: 0,
-              left: _indicatorLeft,
-              child: Container(
-                width: itemWidth,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: ThemeColor.accent,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                ),
-              ),
-            ),
-          ],
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          elevation: 2,
+          height: 60,
+          color: ThemeColor.secondary,
+          surfaceTintColor: ThemeColor.black,
+          child: TabBar(
+            controller: _tabController,
+            dividerColor: Colors.transparent,
+            indicatorColor: ThemeColor.accent,
+            onTap: (value) => _setPage(value, itemWidth),
+            splashFactory: NoSplash.splashFactory,
+            tabs: [
+              Tab(icon: Icon(Icons.home, color: _currentIndex == 0 ? ThemeColor.accent : ThemeColor.black)),
+              Tab(icon: Icon(Icons.history, color: _currentIndex == 1 ? ThemeColor.accent : ThemeColor.black)),
+              const Tab(icon: SizedBox.shrink()),
+              Tab(icon: Icon(Icons.notifications, color: _currentIndex == 3 ? ThemeColor.accent : ThemeColor.black)),
+              Tab(icon: Icon(Icons.person, color: _currentIndex == 4 ? ThemeColor.accent : ThemeColor.black)),
+            ],
+          ),
         ),
         body: Container(
             height: MediaQuery.of(context).size.height,
             color: ThemeColor.primary,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (value) => _setIndex(value, itemWidth),
+            child: TabBarView(
+              controller: _tabController,
               children: [
                 SingleChildScrollView(
                     padding: const EdgeInsets.only(right: 15, left: 15),
@@ -155,6 +131,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           ),
                         ),
                         const SizedBox(height: 15),
+                        const Text(
+                          'RECENT WORKOUT',
+                          style: TextStyle(
+                            color: ThemeColor.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
                         const RecentWorkout(),
                         const SizedBox(height: 30),
                         const Text(
@@ -170,7 +155,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ],
                     )),
                 const PRHome(),
+                const SizedBox.shrink(),
                 const NotificationListView(),
+                const ProfileMenu(),
               ],
             )),
       ),
