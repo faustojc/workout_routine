@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 
-class ProfileMenu extends StatelessWidget {
+class ProfileMenu extends StatefulWidget {
   const ProfileMenu({super.key});
+
+  @override
+  State<ProfileMenu> createState() => _ProfileMenuState();
+}
+
+class _ProfileMenuState extends State<ProfileMenu> {
+  bool isLoading = false;
+
+  void _logout(BuildContext context) async {
+    isLoading = true;
+
+    await supabase.auth.signOut();
+    await database.disconnectAndClear().then((value) => isLoading = false);
+
+    if (!context.mounted) return;
+
+    Routes.redirectTo(context, RouteList.login);
+  }
 
   @override
   Widget build(BuildContext context) => Container(
@@ -127,14 +148,18 @@ class ProfileMenu extends StatelessWidget {
               ),
               const SizedBox(height: 35),
               ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeColor.secondary,
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                child: const Text("Logout", style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
+                  onPressed: () => _logout(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeColor.secondary,
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: ThemeColor.white)
+                      : const Text(
+                          "Logout",
+                          style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        )),
             ],
           ),
         ),
