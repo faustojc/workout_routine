@@ -21,14 +21,15 @@ class InputFormField extends StatefulWidget {
   final IconData? suffixIcon;
   final String? label;
   final String? hint;
+  final Color? fillColor;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final bool readOnly;
   final void Function()? onTap;
 
   const InputFormField({
-    super.key,
     required this.type,
+    super.key,
     this.readOnly = false,
     this.decoration = FieldDecoration.outlined,
     this.label,
@@ -38,6 +39,7 @@ class InputFormField extends StatefulWidget {
     this.onTap,
     this.icon,
     this.suffixIcon,
+    this.fillColor,
   });
 
   @override
@@ -55,6 +57,7 @@ class _InputFormFieldState extends State<InputFormField> {
   void initState() {
     super.initState();
 
+    _fillColor = widget.fillColor ?? ThemeColor.secondary.withOpacity(0.2);
     _obscureText = widget.type == FieldType.password;
     _controller = widget.controller ?? TextEditingController();
 
@@ -92,8 +95,6 @@ class _InputFormFieldState extends State<InputFormField> {
         borderSide: BorderSide.none,
         borderRadius: BorderRadius.all(Radius.circular(28)),
       );
-
-      _fillColor = ThemeColor.secondary.withOpacity(0.2);
     }
   }
 
