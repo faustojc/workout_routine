@@ -31,12 +31,24 @@ class _SplashScreenLoadingState extends State<SplashScreenLoading> {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(RouteList.home.name);
       }
+
+      return;
     } else if (mounted) {
-      Navigator.of(context).pushReplacementNamed(RouteList.auth.name);
+      Navigator.of(context).pushReplacementNamed(RouteList.login.name);
     }
+
+    return;
   }
 
   Future<void> _fetchData() async {
+    // Use only for virtual device testing
+    // AthleteModel.current = AthleteModel.fromJson(await supabase.from("athletes").select().eq("userId", user.id).single());
+    // SubscriptionModel.current = SubscriptionModel.fromJson(await supabase.from("subscriptions").select().eq("userId", user.id).single());
+    // PersonalRecordModel.list = PersonalRecordModel.fromList(await supabase.from("personal_records").select().eq("userId", user.id));
+    // PRHistoryModel.list = PRHistoryModel.fromList(await supabase.from("personal_records_history").select().eq("userId", user.id));
+    // UserWorkoutModel.list = UserWorkoutModel.fromList(await supabase.from("user_workouts").select().eq("userId", user.id));
+
+    // Use for physical device testing
     AthleteModel.current = await AthleteModel.getByUserId(user.id);
     SubscriptionModel.current = await SubscriptionModel.getSingleByUserId(user.id);
 
