@@ -7,9 +7,9 @@ class StatusAlertDialog extends StatefulWidget {
   final String currentStatusText;
 
   const StatusAlertDialog({
-    super.key,
     required this.currentStatusIndicator,
     required this.currentStatusText,
+    super.key,
   });
 
   @override
