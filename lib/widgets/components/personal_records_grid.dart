@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/personal_records.dart';
@@ -81,12 +82,11 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
       crossAxisCount: _personalRecordsCount,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
       children: PersonalRecordModel.list.where((record) => record.userId == user.id).map((record) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          constraints: (_personalRecordsCount == 1) ? const BoxConstraints(maxHeight: 350, maxWidth: 350) : const BoxConstraints(maxHeight: 200, maxWidth: 200),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             color: ThemeColor.accent,
@@ -98,15 +98,20 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  AutoSizeText(
                     record.title,
                     overflow: TextOverflow.fade,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 17,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_forward_ios_rounded)),
+                  FittedBox(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {},
+                    ),
+                  ),
                 ],
               ),
               Row(
@@ -122,13 +127,15 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      AutoSizeText(
                         _dateFormatter(_getRecentPRHistory(record.id).createdAt),
-                        style: const TextStyle(fontSize: 15),
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
                       ),
                       const Text(
                         'lbs',
-                        style: TextStyle(fontSize: 15),
+                        style: TextStyle(fontSize: 14),
                       ),
                     ],
                   )
@@ -140,7 +147,7 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
                 label: const Text(
                   'View History',
                   textScaler: TextScaler.linear(0.7),
