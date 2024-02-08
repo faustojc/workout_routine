@@ -20,7 +20,9 @@ class InputFormField extends StatefulWidget {
   final IconData? icon;
   final IconData? suffixIcon;
   final String? label;
+  final TextStyle? labelStyle;
   final String? hint;
+  final TextStyle? hintStyle;
   final Color? fillColor;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
@@ -33,7 +35,9 @@ class InputFormField extends StatefulWidget {
     this.readOnly = false,
     this.decoration = FieldDecoration.outlined,
     this.label,
+    this.labelStyle,
     this.hint,
+    this.hintStyle,
     this.controller,
     this.validator,
     this.onTap,
@@ -62,7 +66,7 @@ class _InputFormFieldState extends State<InputFormField> {
     _controller = widget.controller ?? TextEditingController();
 
     if (widget.suffixIcon != null) {
-      _suffixIcon = Icon(widget.suffixIcon);
+      _suffixIcon = Icon(widget.suffixIcon, color: ThemeColor.white);
     } else {
       _suffixIcon = null;
     }
@@ -73,12 +77,12 @@ class _InputFormFieldState extends State<InputFormField> {
         setState(() {
           if (widget.type == FieldType.password) {
             _suffixIcon = IconButton(
-              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off, color: ThemeColor.white),
               onPressed: _setObscureText,
             );
           } else if (widget.type == FieldType.text && _controller.text.isNotEmpty) {
             _suffixIcon = IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.clear, color: ThemeColor.white),
               onPressed: _clearText,
             );
           }
@@ -102,7 +106,7 @@ class _InputFormFieldState extends State<InputFormField> {
     setState(() {
       _obscureText = !_obscureText;
       _suffixIcon = IconButton(
-        icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+        icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off, color: ThemeColor.white),
         onPressed: _setObscureText,
       );
     });
@@ -123,14 +127,18 @@ class _InputFormFieldState extends State<InputFormField> {
       controller: widget.controller,
       keyboardType: (widget.type == FieldType.int || widget.type == FieldType.double) ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
-        prefixIcon: widget.icon != null ? Icon(widget.icon) : null,
+        prefixIcon: widget.icon != null ? Icon(widget.icon, color: ThemeColor.white) : null,
         suffixIcon: _suffixIcon,
         labelText: widget.label,
         hintText: widget.hint,
         filled: widget.decoration == FieldDecoration.filled || widget.decoration == FieldDecoration.borderless,
         border: _border,
         fillColor: _fillColor,
+        labelStyle: widget.labelStyle,
+        hintStyle: widget.hintStyle,
+        enabledBorder: (_fillColor != null) ? const UnderlineInputBorder(borderSide: BorderSide(color: ThemeColor.white)) : null,
       ),
+      style: const TextStyle(color: ThemeColor.white),
       obscureText: _obscureText,
       validator: widget.validator,
       onChanged: (String value) {
