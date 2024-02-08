@@ -160,6 +160,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
                           "Logout",
                           style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.bold),
                         )),
+              const SizedBox(height: 20)
             ],
           ),
         ),
