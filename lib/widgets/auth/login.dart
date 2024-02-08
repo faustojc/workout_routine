@@ -89,129 +89,141 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: ThemeColor.primary,
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              FractionallySizedBox(
-                heightFactor: 0.5,
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/backgrounds/login_bg.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Column(
+  Widget build(BuildContext context) => Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      color: ThemeColor.primary,
+      child: Flex(
+        direction: Axis.vertical,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Flexible(
+            flex: 6,
+            fit: FlexFit.tight,
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/backgrounds/login_bg.png'),
+                  fit: BoxFit.fill,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border(
-                                bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
-                              ),
-                            ),
-                            child: TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: ThemeColor.white,
-                                  fontSize: 17,
-                                ),
-                              ),
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: () {},
+                          style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: ThemeColor.white,
+                              fontSize: 17,
                             ),
                           ),
-                          const SizedBox(width: 20),
-                          Container(
-                            color: Colors.transparent,
-                            child: TextButton(
-                              onPressed: () => Routes.to(context, RouteList.register, 'right'),
-                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                              child: const Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: ThemeColor.white,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      Expanded(
-                        child: Center(
-                          child: Image.asset('assets/images/icons/s&c-logo-bw.png', width: 100, height: 100),
+                      const SizedBox(width: 20),
+                      Container(
+                        color: Colors.transparent,
+                        child: TextButton(
+                          onPressed: () => Routes.to(context, RouteList.register, 'right'),
+                          style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                          child: const Text(
+                            'Register',
+                            style: TextStyle(
+                              color: ThemeColor.white,
+                              fontSize: 17,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                  Expanded(
+                    child: Align(
+                      child: Image.asset('assets/images/icons/logo-white.png', width: 290, height: 290),
+                    ),
+                  )
+                ],
               ),
-              FractionallySizedBox(
-                  heightFactor: 0.5,
-                  child: Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            InputFormField(
-                              controller: _emailController,
-                              type: FieldType.text,
-                              decoration: FieldDecoration.filled,
-                              label: 'Email',
-                              validator: _validateEmail,
-                              fillColor: Colors.transparent,
-                            ),
-                            InputFormField(
-                              controller: _passwordController,
-                              type: FieldType.password,
-                              decoration: FieldDecoration.filled,
-                              label: 'Password',
-                              validator: _validatePassword,
-                              fillColor: Colors.transparent,
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                'Forgot Password?',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => _login(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ThemeColor.tertiary,
-                                padding: const EdgeInsets.all(15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: _isLoading
-                                  ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(ThemeColor.white)) //
-                                  : const Text('Login'),
-                            ),
-                          ],
+            ),
+          ),
+          Flexible(
+            flex: 4,
+            fit: FlexFit.tight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 10.0),
+              child: Material(
+                color: Colors.transparent,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      InputFormField(
+                        controller: _emailController,
+                        type: FieldType.text,
+                        decoration: FieldDecoration.filled,
+                        label: 'Email',
+                        labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                        validator: _validateEmail,
+                        fillColor: Colors.transparent,
+                      ),
+                      InputFormField(
+                        controller: _passwordController,
+                        type: FieldType.password,
+                        decoration: FieldDecoration.filled,
+                        label: 'Password',
+                        labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                        validator: _validatePassword,
+                        fillColor: Colors.transparent,
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
+                          ),
                         ),
                       ),
-                    ),
-                  ))
-            ],
-          ),
-        ),
-      );
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => _login(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeColor.secondary,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(26),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(ThemeColor.white)) //
+                              : const Text('Login',
+                                  style: TextStyle(
+                                    color: ThemeColor.white,
+                                    fontSize: 18,
+                                  )),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ));
 }
