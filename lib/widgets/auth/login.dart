@@ -189,7 +189,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                         fillColor: Colors.transparent,
                       ),
                       Align(
-                        alignment: Alignment.centerRight,
+                        alignment: Alignment.topRight,
                         child: TextButton(
                           onPressed: () {},
                           child: const Text(
