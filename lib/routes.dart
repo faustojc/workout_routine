@@ -6,10 +6,8 @@ import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
 import 'package:workout_routine/widgets/user/profile.dart';
 import 'package:workout_routine/widgets/user/profile/measure_units.dart';
-import 'package:workout_routine/widgets/workouts/days_page.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
-import 'package:workout_routine/widgets/workouts/start_page.dart';
-import 'package:workout_routine/widgets/workouts/weeks_page.dart';
+import 'package:workout_routine/widgets/workouts/start_workout_page.dart';
 import 'package:workout_routine/widgets/workouts/workout_page.dart';
 
 enum RouteList {
@@ -20,8 +18,6 @@ enum RouteList {
   editProfile,
   startWorkout,
   periodization,
-  weeks,
-  days,
   workouts,
   personal_record,
   measureUnits,
@@ -44,10 +40,6 @@ extension RouteListExtension on RouteList {
         return '/start_workout';
       case RouteList.periodization:
         return '/periodization';
-      case RouteList.weeks:
-        return '/weeks';
-      case RouteList.days:
-        return '/days';
       case RouteList.workouts:
         return '/workouts';
       case RouteList.personal_record:
@@ -66,10 +58,8 @@ class Routes {
     RouteList.register: (_) => const RegisterForm(),
     RouteList.profile: (_) => const Profile(),
     RouteList.editProfile: (_) => const EditProfile(),
-    RouteList.startWorkout: (_) => const StartWorkout(),
+    RouteList.startWorkout: (_) => const StartWorkoutPage(),
     RouteList.periodization: (_) => const PeriodizationPage(),
-    RouteList.weeks: (_) => const WeeksPage(),
-    RouteList.days: (_) => const DaysPage(),
     RouteList.workouts: (_) => const WorkoutPage(),
     RouteList.personal_record: (_) => const PRHome(),
     RouteList.measureUnits: (_) => const MeasureUnits(),
