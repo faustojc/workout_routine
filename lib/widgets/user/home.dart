@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_routine/models/athletes.dart';
-import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/services/connectivity_service.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/notification_listview.dart';
@@ -10,6 +9,7 @@ import 'package:workout_routine/widgets/components/recent_workout.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
 import 'package:workout_routine/widgets/user/profile/profile_menu.dart';
+import 'package:workout_routine/widgets/workouts/start_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -36,10 +36,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     _tabController = TabController(length: 5, vsync: this);
     _tabController.addListener(() {
-      _currentIndex = _tabController.index;
-
-      if (_tabController.index == 2) {
-        _tabController.index = _tabController.previousIndex;
+      if (_tabController.indexIsChanging) {
+        _setPage(_tabController.index);
+      }
+    });
+    _tabController.animation!.addListener(() {
+      if (_tabController.indexIsChanging) {
+        _setPage(_tabController.index);
       }
     });
   }
@@ -51,22 +54,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _setPage(int value, double itemWidth) {
-    setState(() {
-      _currentIndex = value;
-    });
-  }
+  void _setPage(int value) => setState(() => _currentIndex = value);
 
   @override
   Widget build(BuildContext context) {
-    double itemWidth = MediaQuery.of(context).size.width / 5;
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: ThemeColor.primary,
         resizeToAvoidBottomInset: true,
         floatingActionButton: FloatingActionButton(
-          onPressed: () => Routes.to(context, RouteList.startWorkout, 'right'),
+          onPressed: () {
+            _tabController.animateTo(2, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+            _setPage(2);
+          },
           elevation: 4,
           backgroundColor: ThemeColor.accent,
           shape: const CircleBorder(),
@@ -83,12 +83,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             controller: _tabController,
             dividerColor: Colors.transparent,
             indicatorColor: ThemeColor.accent,
-            onTap: (value) => _setPage(value, itemWidth),
+            onTap: (value) => _setPage(value),
             splashFactory: NoSplash.splashFactory,
             tabs: [
               Tab(icon: Icon(Icons.home, color: _currentIndex == 0 ? ThemeColor.accent : ThemeColor.black)),
               Tab(icon: Icon(Icons.history, color: _currentIndex == 1 ? ThemeColor.accent : ThemeColor.black)),
-              const Tab(icon: SizedBox.shrink()),
+              const IgnorePointer(child: SizedBox.shrink()),
               Tab(icon: Icon(Icons.notifications, color: _currentIndex == 3 ? ThemeColor.accent : ThemeColor.black)),
               Tab(icon: Icon(Icons.person, color: _currentIndex == 4 ? ThemeColor.accent : ThemeColor.black)),
             ],
@@ -152,10 +152,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 20),
                         const PersonalRecordsGrid(),
+                        const SizedBox(height: 30),
                       ],
                     )),
                 const PRHome(),
-                const SizedBox.shrink(),
+                const StartWorkout(),
                 const NotificationListView(),
                 const ProfileMenu(),
               ],
