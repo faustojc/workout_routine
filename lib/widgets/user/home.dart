@@ -9,7 +9,7 @@ import 'package:workout_routine/widgets/components/recent_workout.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
 import 'package:workout_routine/widgets/user/profile/profile_menu.dart';
-import 'package:workout_routine/widgets/workouts/start_page.dart';
+import 'package:workout_routine/widgets/workouts/start_workout_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -156,7 +156,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ],
                     )),
                 const PRHome(),
-                const StartWorkout(),
+                const StartWorkoutPage(),
                 const NotificationListView(),
                 const ProfileMenu(),
               ],
