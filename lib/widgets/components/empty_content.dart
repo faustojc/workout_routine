@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:workout_routine/themes/colors.dart';
 
@@ -18,7 +19,7 @@ class EmptyContent extends StatelessWidget {
             (icon != null) //
                 ? Icon(icon, size: 50, color: ThemeColor.white)
                 : Image.asset('assets/images/icons/empty-content.png', scale: 0.8),
-            Text(
+            AutoSizeText(
               title,
               style: const TextStyle(
                 fontSize: 16,
@@ -28,7 +29,7 @@ class EmptyContent extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             (subtitle != null)
-                ? Text(
+                ? AutoSizeText(
                     subtitle!,
                     style: const TextStyle(
                       fontSize: 14,
