@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/personal_records.dart';
 import 'package:workout_routine/models/personal_records_history.dart';
@@ -22,7 +23,7 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
     super.initState();
   }
 
-  PRHistoryModel _getRecentPRHistory(String prId) {
+  PRHistoryModel _recentHistory(String prId) {
     if (PRHistoryModel.list.length == 1) {
       return PRHistoryModel.list.first;
     }
@@ -32,14 +33,6 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
     prHistory.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return prHistory.first;
-  }
-
-  String _dateFormatter(DateTime date) {
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final year = date.year.toString().padLeft(2, '0');
-
-    return '$month/$day/$year';
   }
 
   @override
@@ -92,7 +85,7 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
             color: ThemeColor.accent,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -116,41 +109,25 @@ class _PersonalRecordsGridState extends State<PersonalRecordsGrid> {
               ),
               Row(
                 children: [
-                  Text(
-                    _getRecentPRHistory(record.id).weight.toString(),
+                  AutoSizeText(
+                    _recentHistory(record.id).weight.toString(),
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AutoSizeText(
-                        _dateFormatter(_getRecentPRHistory(record.id).createdAt),
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                      const Text(
-                        'lbs',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  )
+                  const Text(
+                    'lbs',
+                    style: TextStyle(fontSize: 14),
+                  ),
                 ],
               ),
-              ActionChip(
-                onPressed: () {},
-                backgroundColor: ThemeColor.accent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                label: const Text(
-                  'View History',
-                  textScaler: TextScaler.linear(0.7),
+              Text(
+                DateFormat.yMMMMd().format(_recentHistory(record.id).createdAt),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
                 ),
               ),
             ],
