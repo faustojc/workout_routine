@@ -20,7 +20,7 @@ class NotificationModel {
   static List<NotificationModel> list = [];
 
   factory NotificationModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, value is String && key == 'createdAt' ? DateTime.parse(value) : value));
 
     return NotificationModel(id: data['id'], userId: data['userId'], message: data['message'], isRead: data['isRead'], createdAt: data['createdAt']);
   }

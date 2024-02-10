@@ -23,7 +23,7 @@ class PeriodizationModel {
   static List<PeriodizationModel> list = [];
 
   factory PeriodizationModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, value is String && (key == 'createdAt' || key == 'updatedAt') ? DateTime.parse(value) : value));
 
     return PeriodizationModel(
       id: data['id'],

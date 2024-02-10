@@ -21,7 +21,7 @@ class PersonalRecordModel {
   static List<PersonalRecordModel> list = [];
 
   factory PersonalRecordModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (value is String) && (key == 'createdAt' || key == 'updatedAt') ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, value is String && (key == 'createdAt' || key == 'updatedAt') ? DateTime.parse(value) : value));
 
     return PersonalRecordModel(
       id: data['id'],

@@ -21,7 +21,7 @@ class PRHistoryModel {
   static List<PRHistoryModel> list = [];
 
   factory PRHistoryModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, (value is String) && (key == 'createdAt') ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, value is String && (key == 'createdAt') ? DateTime.parse(value) : value));
 
     return PRHistoryModel(
       id: data['id'],

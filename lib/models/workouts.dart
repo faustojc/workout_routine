@@ -27,7 +27,7 @@ class WorkoutModel {
   static List<WorkoutModel> list = [];
 
   factory WorkoutModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(key, value is String && (key == 'createdAt' || key == 'updatedAt') ? DateTime.parse(value) : value));
 
     return WorkoutModel(
       id: data['id'],
@@ -41,7 +41,7 @@ class WorkoutModel {
     );
   }
 
-  static List<WorkoutModel> fromJsonList(List<dynamic> json) {
+  static List<WorkoutModel> fromList(List<dynamic> json) {
     return json.map((e) {
       final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
 
@@ -63,7 +63,7 @@ class WorkoutModel {
   static Future<List<WorkoutModel>> getAll() async {
     final results = await database.getAll("SELECT * FROM $table");
 
-    return fromJsonList(results);
+    return fromList(results);
   }
 
   static Future<WorkoutModel> getSingle(String id) async {
@@ -75,12 +75,12 @@ class WorkoutModel {
   static Future<List<WorkoutModel>> getAllByDaysId(String daysId) async {
     final results = await database.getAll("SELECT * FROM $table WHERE daysId = ? ORDER BY createdAt DESC", [daysId]);
 
-    return fromJsonList(results);
+    return fromList(results);
   }
 
   static Stream<List<WorkoutModel>> watch(String daysId) {
     return database.watch("SELECT * FROM $table WHERE daysId = $daysId ORDER BY createdAt DESC").map(//
-        (results) => fromJsonList(results) //
+        (results) => fromList(results) //
         );
   }
 
