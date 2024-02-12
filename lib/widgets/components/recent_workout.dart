@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_routine/models/user_workouts.dart';
 import 'package:workout_routine/models/workout_parameters.dart';
 import 'package:workout_routine/models/workouts.dart';
 import 'package:workout_routine/themes/colors.dart';
@@ -11,9 +13,25 @@ class RecentWorkout extends StatefulWidget {
 }
 
 class _RecentWorkoutState extends State<RecentWorkout> {
+  late WorkoutModel currWorkout;
+
+  List<WorkoutParameterModel> workoutParams = [];
+  double playedDuration = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    currWorkout = WorkoutModel.list.where((workout) => workout.id == UserWorkoutModel.current!.workoutId).first;
+    workoutParams = WorkoutParameterModel.list //
+        .where((param) => param.workoutId == UserWorkoutModel.current!.workoutId)
+        .toList();
+    playedDuration = (UserWorkoutModel.current!.playedAt.inSeconds / currWorkout.videoDuration.inSeconds) * 100;
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (WorkoutModel.current == null) {
+    if (UserWorkoutModel.current == null) {
       return Container(
           padding: const EdgeInsets.all(20.0),
           width: MediaQuery.of(context).size.width,
@@ -50,40 +68,67 @@ class _RecentWorkoutState extends State<RecentWorkout> {
     return Container(
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(16.0),
-      constraints: const BoxConstraints(minHeight: 200, maxHeight: 280),
+      constraints: const BoxConstraints(minHeight: 280, maxHeight: 280),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
-          image: NetworkImage(WorkoutModel.current!.thumbnailUrl),
+          image: NetworkImage(currWorkout.thumbnailUrl),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
+          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken),
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            WorkoutModel.current!.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: WorkoutParameterModel.list.where((workoutParam) => workoutParam.workoutId == WorkoutModel.current!.id).map((workoutParam) {
-              return Text(
-                '${workoutParam.name}: ${workoutParam.value}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              );
-            }).toList(),
-          )
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      AutoSizeText(
+                        WorkoutModel.current!.title,
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                          color: ThemeColor.white,
+                          fontSize: 52,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Column(
+                        children: workoutParams //
+                            .take((workoutParams.length > 1) ? 2 : 1)
+                            .map((param) => AutoSizeText(param.value, style: const TextStyle(color: ThemeColor.white, fontSize: 14)))
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: playedDuration,
+                      backgroundColor: ThemeColor.tertiary,
+                      minHeight: 14,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.greenAccent),
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
