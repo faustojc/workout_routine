@@ -67,17 +67,18 @@ class _RegisterFormState extends State<RegisterForm> {
         session = response.session!;
         user = response.user!;
 
-        await AthleteModel.create(
-          athleteInfo['firstname'],
-          athleteInfo['lastname'],
-          athleteInfo['gender'],
-          athleteInfo['city'],
-          athleteInfo['address'],
-          athleteInfo['age'],
-          athleteInfo['weight'],
-          athleteInfo['height'],
-          athleteInfo['birthday'],
-        );
+        await AthleteModel.create({
+          'userId': user.id,
+          'firstName': athleteInfo['firstName'],
+          'lastName': athleteInfo['lastName'],
+          'sex': athleteInfo['sex'],
+          'age': athleteInfo['age'],
+          'weight': athleteInfo['weight'],
+          'height': athleteInfo['height'],
+          'birthday': athleteInfo['birthday'],
+          'city': athleteInfo['city'],
+          'address': athleteInfo['address'],
+        });
 
         setState(() {
           _currentStatusText = 'Registration successful! Email confirmation was sent to ${userInfo['email']} to verify your account.';
