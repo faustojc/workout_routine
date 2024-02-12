@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 
 class MeasureUnits extends StatefulWidget {
@@ -19,24 +18,27 @@ class _MeasureUnitsState extends State<MeasureUnits> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          backgroundColor: ThemeColor.primary,
           title: const Text(
-            'Measure of Units',
+            'Units of Measure',
             style: TextStyle(color: ThemeColor.white, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => Routes.back(context),
+            onPressed: () => Navigator.pop(context),
+            icon: const CircleAvatar(
+              backgroundColor: ThemeColor.tertiary,
+              child: Icon(Icons.arrow_back, color: ThemeColor.white),
+            ),
           ),
         ),
         body: Container(
           color: ThemeColor.primary,
           padding: const EdgeInsets.all(20.0),
-          margin: const EdgeInsets.only(top: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Divider(color: ThemeColor.tertiary, thickness: 2),
+              const Divider(color: ThemeColor.tertiary, thickness: 1),
               ListTile(
                 title: const Text(
                   'Pounds',
@@ -49,7 +51,7 @@ class _MeasureUnitsState extends State<MeasureUnits> {
                   activeColor: Colors.greenAccent,
                 ),
               ),
-              const Divider(color: ThemeColor.tertiary, thickness: 2),
+              const Divider(color: ThemeColor.tertiary, thickness: 1),
               ListTile(
                 title: const Text(
                   'Kilograms',
@@ -62,6 +64,7 @@ class _MeasureUnitsState extends State<MeasureUnits> {
                   activeColor: Colors.greenAccent,
                 ),
               ),
+              const Divider(color: ThemeColor.tertiary, thickness: 1),
             ],
           ),
         ),
