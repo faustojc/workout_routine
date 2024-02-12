@@ -27,51 +27,55 @@ class PeriodizationPage extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           color: ThemeColor.primary,
           padding: const EdgeInsets.all(20.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Column(
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AutoSizeText(
-                      PeriodizationModel.current!.acronym ?? PeriodizationModel.current!.name,
-                      style: const TextStyle(fontSize: 50, color: ThemeColor.white, fontWeight: FontWeight.w600),
+                    Column(
+                      children: [
+                        AutoSizeText(
+                          PeriodizationModel.current!.acronym ?? PeriodizationModel.current!.name,
+                          style: const TextStyle(fontSize: 50, color: ThemeColor.white, fontWeight: FontWeight.w600),
+                        ),
+                        AutoSizeText(
+                          PeriodizationModel.current!.name,
+                          style: const TextStyle(color: ThemeColor.tertiary, fontSize: 16, fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: ThemeColor.tertiary, width: 2),
+                          ),
+                          child: AutoSizeText(
+                            PeriodizationModel.current!.description,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: ThemeColor.white, fontSize: 14),
+                          ),
+                        )
+                      ],
                     ),
-                    AutoSizeText(
-                      PeriodizationModel.current!.name,
-                      style: const TextStyle(color: ThemeColor.tertiary, fontSize: 16, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: ThemeColor.tertiary, width: 2),
-                      ),
-                      child: AutoSizeText(
-                        PeriodizationModel.current!.description,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: ThemeColor.white, fontSize: 14),
-                      ),
-                    )
+                    const SizedBox(height: 20),
+                    _isDataEmpty()
+                        ? const EmptyContent(icon: Icons.not_interested, title: "No week yet", subtitle: "This content is not available yet")
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: WeekModel.list //
+                                .where((week) => week.periodizationId == PeriodizationModel.current!.id)
+                                .map((week) => Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      child: WeekCard(week: week),
+                                    ))
+                                .toList(),
+                          ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                _isDataEmpty()
-                    ? const EmptyContent(icon: Icons.not_interested, title: "No week yet", subtitle: "This content is not available yet")
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: WeekModel.list //
-                            .where((week) => week.periodizationId == PeriodizationModel.current!.id)
-                            .map((week) => Container(
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  child: WeekCard(week: week),
-                                ))
-                            .toList(),
-                      ),
-              ],
-            ),
+              )
+            ],
           ),
         ),
       );
