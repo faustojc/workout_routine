@@ -13,7 +13,7 @@ final Map<String, dynamic> athleteInfo = {
   'userId': '',
   'firstName': '',
   'lastName': '',
-  'gender': '',
+  'sex': '',
   'age': '',
   'weight': '',
   'height': '',
