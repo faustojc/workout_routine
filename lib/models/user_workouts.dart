@@ -1,3 +1,4 @@
+import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
 
 class UserWorkoutModel {
@@ -6,7 +7,8 @@ class UserWorkoutModel {
   final String id;
   final String userId;
   final String workoutId;
-  final DateTime playedAt;
+  final String status;
+  final Duration playedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -14,6 +16,7 @@ class UserWorkoutModel {
     required this.id,
     required this.userId,
     required this.workoutId,
+    required this.status,
     required this.playedAt,
     required this.createdAt,
     required this.updatedAt,
@@ -29,6 +32,7 @@ class UserWorkoutModel {
       id: data['id'],
       userId: data['userId'],
       workoutId: data['workoutId'],
+      status: data['status'],
       playedAt: data['playedAt'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
@@ -39,7 +43,17 @@ class UserWorkoutModel {
     if (json == null) return [];
 
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, key == 'playedAt' || key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) {
+        dynamic newValue = value;
+
+        if ((key == 'playedAt' || key == 'createdAt' || key == 'updatedAt') && value is String) {
+          newValue = DateTime.parse(value);
+        } else if (key == 'videoDuration' && value is int) {
+          newValue = Duration(seconds: value);
+        }
+
+        return MapEntry(key, newValue);
+      });
 
       return UserWorkoutModel.fromJson(data);
     }).toList();
@@ -49,6 +63,7 @@ class UserWorkoutModel {
         'id': id,
         'userId': userId,
         'workoutId': workoutId,
+        'status': status,
         'playedAt': playedAt,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
@@ -72,24 +87,43 @@ class UserWorkoutModel {
         );
   }
 
-  static Future<void> create(String userId, String workoutId, DateTime playedAt) async {
-    await database.execute(
-      "INSERT INTO $table (userId, workoutId, playedAt, createdAt) VALUES (?, ?, ?, ?)",
-      [userId, workoutId, playedAt, DateTime.now()],
-    );
+  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> columns = [];
+    List<String> values = [];
+    List<String> placeholders = [];
+
+    fields.forEach((key, value) {
+      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+
+      columns.add(key);
+      values.add(value);
+      placeholders.add("?");
+    });
+
+    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
+    return await database.execute(sql, values);
   }
 
-  static Future<void> update(String id, String userId, String workoutId, DateTime playedAt) async {
-    await database.execute(
-      "UPDATE $table SET playedAt = ?, createdAt = ? WHERE id = ? AND userId = ?",
-      [playedAt, DateTime.now(), id, userId],
-    );
+  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> updates = [];
+    List<dynamic> values = [];
+
+    fields.forEach((key, value) {
+      updates.add("$key = ?");
+      values.add(value);
+    });
+
+    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
+    values.add(id);
+
+    return await database.execute(sql, values);
   }
 
-  static Future<void> delete(String id, String userId) async {
-    await database.execute(
-      "DELETE FROM $table WHERE id = ? AND userId = ?",
-      [id, userId],
-    );
+  static Future<ResultSet> delete(String id) async {
+    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
   }
 }

@@ -1,7 +1,8 @@
+import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
 
 class WorkoutModel {
-  static const String table = 'workouts';
+  static const String table = "workouts";
 
   final String id;
   final String daysId;
@@ -9,6 +10,7 @@ class WorkoutModel {
   final String description;
   final String videoUrl;
   final String thumbnailUrl;
+  final Duration videoDuration;
   final String? createdAt;
   final String? updatedAt;
 
@@ -19,6 +21,7 @@ class WorkoutModel {
     required this.description,
     required this.videoUrl,
     required this.thumbnailUrl,
+    required this.videoDuration,
     this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +39,7 @@ class WorkoutModel {
       description: data['description'],
       videoUrl: data['video_url'],
       thumbnailUrl: data['thumbnail_url'],
+      videoDuration: data['videoDuration'],
       createdAt: data['created_at'],
       updatedAt: data['updated_at'],
     );
@@ -43,7 +47,17 @@ class WorkoutModel {
 
   static List<WorkoutModel> fromList(List<dynamic> json) {
     return json.map((e) {
-      final data = e.map((key, value) => MapEntry(key, key == 'createdAt' || key == 'updatedAt' ? DateTime.parse(value) : value));
+      final data = e.map((key, value) {
+        dynamic newValue = value;
+
+        if ((key == 'createdAt' || key == 'updatedAt') && value is String) {
+          newValue = DateTime.parse(value);
+        } else if (key == 'videoDuration' && value is int) {
+          newValue = Duration(seconds: value);
+        }
+
+        return MapEntry(key, newValue);
+      });
 
       return WorkoutModel.fromJson(data);
     }).toList();
@@ -56,6 +70,7 @@ class WorkoutModel {
         'description': description,
         'video_url': videoUrl,
         'thumbnail_url': thumbnailUrl,
+        'videoDuration': videoDuration,
         'created_at': createdAt,
         'updated_at': updatedAt,
       };
@@ -79,29 +94,46 @@ class WorkoutModel {
   }
 
   static Stream<List<WorkoutModel>> watch(String daysId) {
-    return database.watch("SELECT * FROM $table WHERE daysId = $daysId ORDER BY createdAt DESC").map(//
-        (results) => fromList(results) //
-        );
+    return database.watch("SELECT * FROM $table WHERE daysId = $daysId ORDER BY createdAt DESC").map((results) => fromList(results));
   }
 
-  static Future<void> create(String daysId, String title, String description, String videoUrl, String thumbnailUrl) async {
-    await database.execute(
-      "INSERT INTO $table (daysId, title, description, video_url, thumbnail_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [daysId, title, description, videoUrl, thumbnailUrl, DateTime.now(), DateTime.now()],
-    );
+  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> columns = [];
+    List<String> values = [];
+    List<String> placeholders = [];
+
+    fields.forEach((key, value) {
+      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+
+      columns.add(key);
+      values.add(value);
+      placeholders.add("?");
+    });
+
+    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
+    return await database.execute(sql, values);
   }
 
-  static Future<void> update(String id, String daysId, String title, String description, String videoUrl, String thumbnailUrl) async {
-    await database.execute(
-      "UPDATE $table SET daysId = ?, title = ?, description = ?, video_url = ?, thumbnail_url = ?, updated_at = ? WHERE id = ?",
-      [daysId, title, description, videoUrl, thumbnailUrl, DateTime.now(), id],
-    );
+  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> updates = [];
+    List<dynamic> values = [];
+
+    fields.forEach((key, value) {
+      updates.add("$key = ?");
+      values.add(value);
+    });
+
+    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
+    values.add(id);
+
+    return await database.execute(sql, values);
   }
 
-  static Future<void> delete(String id) async {
-    await database.execute(
-      "DELETE FROM $table WHERE id = ?",
-      [id],
-    );
+  static Future<ResultSet> delete(String id) async {
+    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
   }
 }

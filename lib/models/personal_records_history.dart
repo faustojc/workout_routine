@@ -1,3 +1,4 @@
+import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
 
 class PRHistoryModel {
@@ -68,24 +69,43 @@ class PRHistoryModel {
         );
   }
 
-  static Future<void> create(String prId, String userId, num weight) async {
-    await database.execute(
-      "INSERT INTO $table (prId, userId, weight, createdAt) VALUES (?, ?, ?, ?)",
-      [prId, userId, weight, DateTime.now()],
-    );
+  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> columns = [];
+    List<String> values = [];
+    List<String> placeholders = [];
+
+    fields.forEach((key, value) {
+      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+
+      columns.add(key);
+      values.add(value);
+      placeholders.add("?");
+    });
+
+    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
+    return await database.execute(sql, values);
   }
 
-  static Future<void> update(String id, String prId, String userId, num weight) async {
-    await database.execute(
-      "UPDATE $table SET weight = ?, createdAt = ? WHERE id = ? AND prId = ? AND userId = ?",
-      [weight, DateTime.now(), id, prId, userId],
-    );
+  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> updates = [];
+    List<dynamic> values = [];
+
+    fields.forEach((key, value) {
+      updates.add("$key = ?");
+      values.add(value);
+    });
+
+    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
+    values.add(id);
+
+    return await database.execute(sql, values);
   }
 
-  static Future<void> delete(String id, String prId, String userId) async {
-    await database.execute(
-      "DELETE FROM $table WHERE id = ? AND prId = ? AND userId = ?",
-      [id, prId, userId],
-    );
+  static Future<ResultSet> delete(String id) async {
+    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
   }
 }

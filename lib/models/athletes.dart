@@ -1,14 +1,15 @@
+import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
 
 class AthleteModel {
-  static const String tableName = "athletes";
+  static const String table = "athletes";
 
   final String id;
   final String userId;
   final String? categoryId;
   final String firstName;
   final String lastName;
-  final String gender;
+  final String sex;
   final String city;
   final String address;
   final int age;
@@ -23,7 +24,7 @@ class AthleteModel {
     required this.userId,
     required this.firstName,
     required this.lastName,
-    required this.gender,
+    required this.sex,
     required this.city,
     required this.address,
     required this.age,
@@ -47,7 +48,7 @@ class AthleteModel {
       categoryId: data['categoryId'],
       firstName: data['firstName'],
       lastName: data['lastName'],
-      gender: data['gender'],
+      sex: data['sex'],
       city: data['city'],
       address: data['address'],
       age: data['age'],
@@ -73,7 +74,7 @@ class AthleteModel {
         'categoryId': categoryId,
         'firstName': firstName,
         'lastName': lastName,
-        'gender': gender,
+        'sex': sex,
         'city': city,
         'address': address,
         'age': age,
@@ -85,41 +86,60 @@ class AthleteModel {
       };
 
   static Future<AthleteModel> getSingle(String id) async {
-    final results = await database.get("SELECT * FROM $tableName WHERE id = ?", [id]);
+    final results = await database.get("SELECT * FROM $table WHERE id = ?", [id]);
 
     return AthleteModel.fromJson(results);
   }
 
   static Future<AthleteModel> getByUserId(String userId) async {
-    final results = await database.get("SELECT * FROM $tableName WHERE userId = ?", [userId]);
+    final results = await database.get("SELECT * FROM $table WHERE userId = ?", [userId]);
 
     return AthleteModel.fromJson(results);
   }
 
   static Stream<List<AthleteModel>> watch(String userId) {
-    return database.watch("SELECT * FROM $tableName WHERE userId = ? ORDER BY createdAt DESC", parameters: [userId]).map(//
+    return database.watch("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", parameters: [userId]).map(//
         (results) => results.map((row) => AthleteModel.fromJson(row)).toList() //
         );
   }
 
-  static Future<void> create(String firstName, String lastName, String gender, String city, String address, int age, num weight, num height, DateTime birthday) async {
-    await database.execute(
-      "INSERT INTO $tableName (firstName, lastName, gender, city, address, age, weight, height, birthday, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [firstName, lastName, gender, city, address, age, weight, height, birthday, DateTime.now()],
-    );
+  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> columns = [];
+    List<String> values = [];
+    List<String> placeholders = [];
+
+    fields.forEach((key, value) {
+      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+
+      columns.add(key);
+      values.add(value);
+      placeholders.add("?");
+    });
+
+    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
+    return await database.execute(sql, values);
   }
 
-  static Future<void> update(String id, String firstName, String lastName, String gender, String city, String address, int age, num weight, num height, DateTime birthday) async {
-    await database.execute(
-      "UPDATE $tableName SET firstName = ?, lastName = ?, gender = ?, city = ?, address = ?, age = ?, weight = ?, height = ?, birthday = ?, updatedAt = ? WHERE id = ?",
-      [firstName, lastName, gender, city, address, age, weight, height, birthday, DateTime.now(), id],
-    );
+  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return null;
+
+    List<String> updates = [];
+    List<dynamic> values = [];
+
+    fields.forEach((key, value) {
+      updates.add("$key = ?");
+      values.add(value);
+    });
+
+    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
+    values.add(id);
+
+    return await database.execute(sql, values);
   }
 
-  static Future<void> delete(String id, String userId) async {
-    await database.execute(
-      "DELETE FROM $tableName WHERE id = ? AND userId = ?",
-      [id, userId],
-    );
+  static Future<ResultSet> delete(String id) async {
+    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
   }
 }
