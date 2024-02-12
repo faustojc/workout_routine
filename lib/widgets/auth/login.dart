@@ -80,150 +80,157 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchData() async {
-    AthleteModel.current = await AthleteModel.getByUserId(user.id);
-    SubscriptionModel.current = await SubscriptionModel.getSingleByUserId(user.id);
+    // Use only for virtual device testing
+    AthleteModel.current = AthleteModel.fromJson(await supabase.from("athletes").select().eq("userId", user.id).single());
+    SubscriptionModel.current = SubscriptionModel.fromJson(await supabase.from("subscriptions").select().eq("userId", user.id).single());
+    PersonalRecordModel.list = PersonalRecordModel.fromList(await supabase.from("personal_records").select().eq("userId", user.id));
+    PRHistoryModel.list = PRHistoryModel.fromList(await supabase.from("personal_records_history").select().eq("userId", user.id));
+    UserWorkoutModel.list = UserWorkoutModel.fromList(await supabase.from("user_workouts").select().eq("userId", user.id));
 
-    PersonalRecordModel.list = await PersonalRecordModel.getAllByUserId(user.id);
-    PRHistoryModel.list = await PRHistoryModel.getAllByUserId(user.id);
-    UserWorkoutModel.list = await UserWorkoutModel.getAllByUserId(user.id);
+    // Use for physical device testing
+    // AthleteModel.current = await AthleteModel.getByUserId(user.id);
+    // SubscriptionModel.current = await SubscriptionModel.getSingleByUserId(user.id);
+    //
+    // PersonalRecordModel.list = await PersonalRecordModel.getAllByUserId(user.id);
+    // PRHistoryModel.list = await PRHistoryModel.getAllByUserId(user.id);
+    // UserWorkoutModel.list = await UserWorkoutModel.getAllByUserId(user.id);
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      color: ThemeColor.primary,
-      child: Flex(
-        direction: Axis.vertical,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Flexible(
-            flex: 6,
-            fit: FlexFit.tight,
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/backgrounds/login_bg.png'),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border(
-                            bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
-                              color: ThemeColor.white,
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Container(
-                        color: Colors.transparent,
-                        child: TextButton(
-                          onPressed: () => Routes.to(context, RouteList.register, 'right'),
-                          style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
-                              color: ThemeColor.white,
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Align(
-                      child: Image.asset('assets/images/icons/logo-white.png', width: 290, height: 290),
+  Widget build(BuildContext context) => Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: ThemeColor.primary,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Flexible(
+                flex: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/backgrounds/login_bg.png'),
+                      fit: BoxFit.fill,
                     ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Flexible(
-            flex: 4,
-            fit: FlexFit.tight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 10.0),
-              child: Material(
-                color: Colors.transparent,
-                child: Form(
-                  key: _formKey,
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      InputFormField(
-                        controller: _emailController,
-                        type: FieldType.text,
-                        decoration: FieldDecoration.filled,
-                        label: 'Email',
-                        labelStyle: const TextStyle(color: ThemeColor.tertiary),
-                        validator: _validateEmail,
-                        fillColor: Colors.transparent,
-                      ),
-                      InputFormField(
-                        controller: _passwordController,
-                        type: FieldType.password,
-                        decoration: FieldDecoration.filled,
-                        label: 'Password',
-                        labelStyle: const TextStyle(color: ThemeColor.tertiary),
-                        validator: _validatePassword,
-                        fillColor: Colors.transparent,
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => _login(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ThemeColor.secondary,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(26),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
+                              ),
+                            ),
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: ThemeColor.white,
+                                  fontSize: 17,
+                                ),
+                              ),
                             ),
                           ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(ThemeColor.white)) //
-                              : const Text('Login',
-                                  style: TextStyle(
-                                    color: ThemeColor.white,
-                                    fontSize: 18,
-                                  )),
+                          const SizedBox(width: 20),
+                          Container(
+                            color: Colors.transparent,
+                            child: TextButton(
+                              onPressed: () => Routes.to(context, RouteList.register, 'right'),
+                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
+                              child: const Text(
+                                'Register',
+                                style: TextStyle(
+                                  color: ThemeColor.white,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Align(
+                          child: Image.asset('assets/images/icons/logo-white.png', width: 290, height: 290),
                         ),
                       )
                     ],
                   ),
                 ),
               ),
-            ),
-          )
-        ],
-      ));
+              Flexible(
+                flex: 4,
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 10.0),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          InputFormField(
+                            controller: _emailController,
+                            type: FieldType.text,
+                            decoration: FieldDecoration.filled,
+                            label: 'Email',
+                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            validator: _validateEmail,
+                            fillColor: Colors.transparent,
+                          ),
+                          InputFormField(
+                            controller: _passwordController,
+                            type: FieldType.password,
+                            decoration: FieldDecoration.filled,
+                            label: 'Password',
+                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            validator: _validatePassword,
+                            fillColor: Colors.transparent,
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _login(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ThemeColor.secondary,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26),
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(color: ThemeColor.white) //
+                                : const Text('Login',
+                                    style: TextStyle(
+                                      color: ThemeColor.white,
+                                      fontSize: 18,
+                                    )),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
 }
