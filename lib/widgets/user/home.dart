@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/services/connectivity_service.dart';
@@ -29,8 +30,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     _connectionStatus = Provider.of<ConnectivityService>(context, listen: false);
     _connectionStatus.addListener(() {
-      if (_connectionStatus.status == InternetStatus.offline) {
+      if (_connectionStatus.status == InternetStatus.disconnected) {
         showToast(context: context, message: "No connection", type: ToastType.info, vsync: this);
+      } else {
+        showToast(context: context, message: "Internet connection restored", type: ToastType.success, vsync: this);
       }
     });
 
