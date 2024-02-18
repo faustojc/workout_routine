@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_routine/themes/colors.dart';
 
@@ -63,7 +64,7 @@ void showToast({
             child: ListTile(
               leading: icon,
               trailing: dismissButton,
-              title: Text(message, style: const TextStyle(color: Colors.white)),
+              title: AutoSizeText(message, style: const TextStyle(color: Colors.white, fontSize: 14)),
             ),
           ),
         ),
