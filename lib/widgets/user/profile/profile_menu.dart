@@ -100,27 +100,29 @@ class _ProfileMenuState extends State<ProfileMenu> {
                   color: ThemeColor.secondary,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
                     ListTile(
-                      leading: Icon(Icons.person, color: ThemeColor.white),
-                      title: Text("Personal Details", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      onTap: () => Routes.to(context, RouteList.personalDetails, 'right'),
+                      leading: const Icon(Icons.person, color: ThemeColor.white),
+                      title: const Text("Personal Details", style: TextStyle(color: ThemeColor.white)),
+                      trailing: const Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
                     ),
-                    ListTile(
+                    const ListTile(
                       leading: Icon(Icons.lock, color: ThemeColor.white),
                       title: Text("Email and Password", style: TextStyle(color: ThemeColor.white)),
                       trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
                     ),
-                    ListTile(
+                    const ListTile(
                       leading: Icon(Icons.settings, color: ThemeColor.white),
                       title: Text("Settings", style: TextStyle(color: ThemeColor.white)),
                       trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
                     ),
                     ListTile(
-                      leading: Icon(Icons.straighten, color: ThemeColor.white),
-                      title: Text("Units of Measure", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      onTap: () => Routes.to(context, RouteList.measureUnits, "right"),
+                      leading: const Icon(Icons.straighten, color: ThemeColor.white),
+                      title: const Text("Units of Measure", style: TextStyle(color: ThemeColor.white)),
+                      trailing: const Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
                     ),
                   ],
                 ),
