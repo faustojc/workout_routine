@@ -39,7 +39,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           child: FadeTransition(
             opacity: _animation,
             child: Image.asset(
-              'assets/images/icons/s&c-logo-bw.png',
+              'assets/images/icons/logo-white.png',
               width: 500,
               height: 500,
             ),
