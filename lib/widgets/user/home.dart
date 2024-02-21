@@ -78,10 +78,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           shape: const CircularNotchedRectangle(),
-          elevation: 2,
           height: 60,
           color: ThemeColor.secondary,
-          surfaceTintColor: ThemeColor.black,
           child: TabBar(
             controller: _tabController,
             dividerColor: Colors.transparent,
