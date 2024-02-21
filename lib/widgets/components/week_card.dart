@@ -11,7 +11,7 @@ class WeekCard extends StatelessWidget {
 
   const WeekCard({required this.week, super.key});
 
-  bool _isDaysEmpty() => DayModel.list.where((day) => day.weeksId == week.id).isEmpty;
+  bool get _isDaysEmpty => DayModel.list.where((day) => day.weeksId == week.id).isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +44,12 @@ class WeekCard extends StatelessWidget {
             indent: 20,
             endIndent: 20,
           ),
-          _isDaysEmpty()
-              ? const EmptyContent(icon: Icons.calendar_month, title: "No days schedule yet")
+          _isDaysEmpty
+              ? const Expanded(
+                  child: EmptyContent(icon: Icons.calendar_month, title: "No days schedule yet"),
+                )
               : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
                   child: Row(
                     children: DayModel.list //
                         .where((day) => day.weeksId == week.id)

@@ -15,35 +15,28 @@ class DayContainer extends StatefulWidget {
 }
 
 class _DayContainerState extends State<DayContainer> {
-  late UserWorkoutModel _userWorkout;
-  late Color _color;
+  UserWorkoutModel? _userWorkout;
+  List<WorkoutModel> _workouts = [];
+
+  late Color _color = ThemeColor.tertiary;
   late Icon? _icon;
-  late BoxBorder? _border;
 
   @override
   void initState() {
     super.initState();
 
-    // get the workout from day
-    WorkoutModel workout = WorkoutModel.list.firstWhere((workout) => workout.daysId == widget.day.id);
-    _userWorkout = UserWorkoutModel.list.firstWhere((userWorkout) => userWorkout.workoutId == workout.id);
+    _workouts = WorkoutModel.list.where((workout) => workout.daysId == widget.day.id).toList();
 
-    // set the color, icon and border based on the status of the user workout
-    switch (_userWorkout.status) {
-      case "complete":
-        _color = Colors.greenAccent;
-        _icon = const Icon(Icons.check_circle, color: Colors.white);
-        _border = null;
-        break;
-      case "incomplete":
-        _color = ThemeColor.tertiary;
-        _icon = const Icon(Icons.highlight_off, color: Colors.white);
-        _border = null;
-        break;
-      case "inProgress":
-        _color = ThemeColor.tertiary;
-        _icon = null;
-        _border = Border.all(color: ThemeColor.accent, width: 2);
+    if (WorkoutModel.list.isNotEmpty) {
+      _userWorkout = UserWorkoutModel.list.firstWhere((userWorkout) => _workouts.any((workout) => workout.id == userWorkout.workoutId));
+
+      // set the color, icon and border based on the status of the user workout
+      if (_userWorkout!.status == "complete") {
+        setState(() {
+          _color = Colors.greenAccent;
+          _icon = const Icon(Icons.check_circle, color: Colors.white);
+        });
+      }
     }
   }
 
@@ -55,8 +48,6 @@ class _DayContainerState extends State<DayContainer> {
             widget.day.title,
             style: const TextStyle(fontSize: 14, color: ThemeColor.white),
           ),
-          const SizedBox(height: 10),
-          // empty rectangle Container with ThemeColor.secondary color and rounded border
           Container(
             width: 65,
             height: 100,
@@ -64,21 +55,20 @@ class _DayContainerState extends State<DayContainer> {
             decoration: BoxDecoration(
               color: _color,
               borderRadius: BorderRadius.circular(12),
-              border: _border,
             ),
-            child: (_userWorkout.status != "inProgress")
+            child: (_userWorkout != null && _userWorkout!.status == "complete")
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _icon!,
                       const SizedBox(height: 5),
                       AutoSizeText(
-                        _userWorkout.status,
+                        _userWorkout!.status,
                         style: const TextStyle(fontSize: 12, color: ThemeColor.white),
                       ),
                     ],
                   )
-                : null,
+                : const Icon(Icons.play_circle, color: ThemeColor.primary),
           ),
         ],
       );
