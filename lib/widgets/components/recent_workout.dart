@@ -22,11 +22,13 @@ class _RecentWorkoutState extends State<RecentWorkout> {
   void initState() {
     super.initState();
 
-    currWorkout = WorkoutModel.list.where((workout) => workout.id == UserWorkoutModel.current!.workoutId).first;
-    workoutParams = WorkoutParameterModel.list //
-        .where((param) => param.workoutId == UserWorkoutModel.current!.workoutId)
-        .toList();
-    playedDuration = (UserWorkoutModel.current!.playedAt.inSeconds / currWorkout.videoDuration.inSeconds) * 100;
+    if (WorkoutModel.list.isNotEmpty && UserWorkoutModel.current != null) {
+      currWorkout = WorkoutModel.list.where((workout) => workout.id == UserWorkoutModel.current!.workoutId).first;
+      workoutParams = WorkoutParameterModel.list //
+          .where((param) => param.workoutId == UserWorkoutModel.current!.workoutId)
+          .toList();
+      playedDuration = (UserWorkoutModel.current!.playedAt.inSeconds / currWorkout.videoDuration.inSeconds) * 100;
+    }
   }
 
   @override
