@@ -26,7 +26,12 @@ class UserWorkoutModel {
   static List<UserWorkoutModel> list = [];
 
   factory UserWorkoutModel.fromJson(Map<dynamic, dynamic> json) {
-    final data = json.map((key, value) => MapEntry(key, value is String && (key == 'playedAt' || key == 'createdAt' || key == 'updatedAt') ? DateTime.parse(value) : value));
+    final data = json.map((key, value) => MapEntry(
+        key,
+        value is String &&
+                (key == 'playedAt' || key == 'createdAt' || key == 'updatedAt')
+            ? DateTime.parse(value)
+            : value));
 
     return UserWorkoutModel(
       id: data['id'],
@@ -46,7 +51,8 @@ class UserWorkoutModel {
       final data = e.map((key, value) {
         dynamic newValue = value;
 
-        if ((key == 'playedAt' || key == 'createdAt' || key == 'updatedAt') && value is String) {
+        if ((key == 'playedAt' || key == 'createdAt' || key == 'updatedAt') &&
+            value is String) {
           newValue = DateTime.parse(value);
         } else if (key == 'videoDuration' && value is int) {
           newValue = Duration(seconds: value);
@@ -70,21 +76,28 @@ class UserWorkoutModel {
       };
 
   static Future<List<UserWorkoutModel>> getAllByUserId(String userId) async {
-    final results = await database.getAll("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
+    final results = await database.getAll(
+        "SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC",
+        [userId]);
 
     return UserWorkoutModel.fromList(results);
   }
 
   static Future<UserWorkoutModel> getSingle(String id, String userId) async {
-    final results = await database.get("SELECT * FROM $table WHERE id = ? AND userId = ?", [id, userId]);
+    final results = await database
+        .get("SELECT * FROM $table WHERE id = ? AND userId = ?", [id, userId]);
 
     return UserWorkoutModel.fromJson(results);
   }
 
   static Stream<List<UserWorkoutModel>> watch(String userId) {
-    return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC").map(//
-        (results) => results.map((row) => UserWorkoutModel.fromJson(row)).toList() //
-        );
+    return database
+        .watch(
+            "SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC")
+        .map(//
+            (results) =>
+                results.map((row) => UserWorkoutModel.fromJson(row)).toList() //
+            );
   }
 
   static Future<ResultSet?> create(Map<String, dynamic> fields) async {
@@ -95,18 +108,22 @@ class UserWorkoutModel {
     List<String> placeholders = [];
 
     fields.forEach((key, value) {
-      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime)
+          ? value.toIso8601String()
+          : value;
 
       columns.add(key);
       values.add(value);
       placeholders.add("?");
     });
 
-    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
+    String sql =
+        "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
     return await database.execute(sql, values);
   }
 
-  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
+  static Future<ResultSet?> update(
+      String id, Map<String, dynamic> fields) async {
     if (fields.isEmpty) return null;
 
     List<String> updates = [];
