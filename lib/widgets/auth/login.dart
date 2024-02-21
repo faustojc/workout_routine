@@ -9,17 +9,18 @@ import 'package:workout_routine/models/subscriptions.dart';
 import 'package:workout_routine/models/user_workouts.dart';
 import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
+import 'package:workout_routine/widgets/components/diagonal_container.dart';
 import 'package:workout_routine/widgets/components/input_form_field.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<Login> createState() => _LoginState();
 }
 
-class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
+class _LoginState extends State<Login> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -56,10 +57,13 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   Future<void> _login(context) async {
     if (_formKey.currentState!.validate()) {
-      // Perform login action
       setState(() => _isLoading = true);
 
-      supabase.auth.signInWithPassword(email: _emailController.text.trim(), password: _passwordController.text.trim()).then((AuthResponse response) async {
+      supabase.auth
+          .signInWithPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim())
+          .then((AuthResponse response) async {
         session = response.session!;
         user = response.user!;
 
@@ -69,10 +73,15 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         await _fetchData();
 
         if (mounted) {
-          Navigator.of(context).pushReplacementNamed(RouteList.home.name);
+          Routes.redirectTo(context, RouteList.home);
         }
       }).onError((AuthException error, _) {
-        showToast(context: context, message: error.message, type: ToastType.error, vsync: this);
+        showToast(
+          context: context,
+          message: error.message,
+          type: ToastType.error,
+          vsync: this,
+        );
       }).whenComplete(() => setState(() => _isLoading = false));
 
       return;
@@ -81,19 +90,21 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   Future<void> _fetchData() async {
     // Use only for virtual device testing
-    AthleteModel.current = AthleteModel.fromJson(await supabase.from("athletes").select().eq("userId", user.id).single());
-    SubscriptionModel.current = SubscriptionModel.fromJson(await supabase.from("subscriptions").select().eq("userId", user.id).single());
-    PersonalRecordModel.list = PersonalRecordModel.fromList(await supabase.from("personal_records").select().eq("userId", user.id));
-    PRHistoryModel.list = PRHistoryModel.fromList(await supabase.from("personal_records_history").select().eq("userId", user.id));
-    UserWorkoutModel.list = UserWorkoutModel.fromList(await supabase.from("user_workouts").select().eq("userId", user.id));
+    // AthleteModel.current = AthleteModel.fromJson(await supabase.from("athletes").select().eq("userId", user.id).single());
+    // SubscriptionModel.current = SubscriptionModel.fromJson(await supabase.from("subscriptions").select().eq("userId", user.id).single());
+    // PersonalRecordModel.list = PersonalRecordModel.fromList(await supabase.from("personal_records").select().eq("userId", user.id));
+    // PRHistoryModel.list = PRHistoryModel.fromList(await supabase.from("personal_records_history").select().eq("userId", user.id));
+    // UserWorkoutModel.list = UserWorkoutModel.fromList(await supabase.from("user_workouts").select().eq("userId", user.id));
 
     // Use for physical device testing
-    // AthleteModel.current = await AthleteModel.getByUserId(user.id);
-    // SubscriptionModel.current = await SubscriptionModel.getSingleByUserId(user.id);
-    //
-    // PersonalRecordModel.list = await PersonalRecordModel.getAllByUserId(user.id);
-    // PRHistoryModel.list = await PRHistoryModel.getAllByUserId(user.id);
-    // UserWorkoutModel.list = await UserWorkoutModel.getAllByUserId(user.id);
+    AthleteModel.current = await AthleteModel.getByUserId(user.id);
+    SubscriptionModel.current =
+        await SubscriptionModel.getSingleByUserId(user.id);
+
+    PersonalRecordModel.list =
+        await PersonalRecordModel.getAllByUserId(user.id);
+    PRHistoryModel.list = await PRHistoryModel.getAllByUserId(user.id);
+    UserWorkoutModel.list = await UserWorkoutModel.getAllByUserId(user.id);
   }
 
   @override
@@ -106,71 +117,83 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Has Image Background with Login and Register navigation
               Flexible(
-                flex: 6,
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/backgrounds/login_bg.png'),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  flex: 6,
+                  child: DiagonalContainer(
+                    color: ThemeColor.secondary,
+                    child: Container(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
                         children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border(
-                                bottom: BorderSide(width: 2, color: ThemeColor.tertiary),
-                              ),
-                            ),
-                            child: TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: ThemeColor.white,
-                                  fontSize: 17,
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: MediaQuery.of(context).padding.top),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    color: Colors.transparent,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 2, color: ThemeColor.tertiary),
+                                    ),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        padding: const EdgeInsets.all(10)),
+                                    child: const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: ThemeColor.white,
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 20),
+                                Container(
+                                  color: Colors.transparent,
+                                  child: TextButton(
+                                    onPressed: () => Routes.to(
+                                        context, RouteList.register, "right"),
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        padding: const EdgeInsets.all(10)),
+                                    child: const Text(
+                                      'Register',
+                                      style: TextStyle(
+                                        color: ThemeColor.white,
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 20),
-                          Container(
-                            color: Colors.transparent,
-                            child: TextButton(
-                              onPressed: () => Routes.to(context, RouteList.register, 'right'),
-                              style: TextButton.styleFrom(backgroundColor: Colors.transparent, padding: const EdgeInsets.all(10)),
-                              child: const Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: ThemeColor.white,
-                                  fontSize: 17,
-                                ),
-                              ),
+                          Expanded(
+                            child: Align(
+                              child: Image.asset(
+                                  'assets/images/icons/logo-white.png',
+                                  width: 290,
+                                  height: 290),
                             ),
-                          ),
+                          )
                         ],
                       ),
-                      Expanded(
-                        child: Align(
-                          child: Image.asset('assets/images/icons/logo-white.png', width: 290, height: 290),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  )),
+              // Input Form Fields
               Flexible(
                 flex: 4,
                 child: Container(
                   color: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 26.0, vertical: 10.0),
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
@@ -183,29 +206,37 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                             type: FieldType.text,
                             decoration: FieldDecoration.filled,
                             label: 'Email',
-                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            labelStyle:
+                                const TextStyle(color: ThemeColor.tertiary),
+                            icon: Icons.email,
                             validator: _validateEmail,
                             fillColor: Colors.transparent,
                           ),
+                          const SizedBox(height: 10),
                           InputFormField(
                             controller: _passwordController,
                             type: FieldType.password,
                             decoration: FieldDecoration.filled,
                             label: 'Password',
-                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            labelStyle:
+                                const TextStyle(color: ThemeColor.tertiary),
+                            icon: Icons.lock,
                             validator: _validatePassword,
                             fillColor: Colors.transparent,
                           ),
+                          const SizedBox(height: 10),
                           Align(
                             alignment: Alignment.topRight,
                             child: TextButton(
                               onPressed: () {},
                               child: const Text(
                                 'Forgot Password?',
-                                style: TextStyle(color: ThemeColor.tertiary, fontSize: 14),
+                                style: TextStyle(
+                                    color: ThemeColor.tertiary, fontSize: 14),
                               ),
                             ),
                           ),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () => _login(context),
                             style: ElevatedButton.styleFrom(
@@ -216,7 +247,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                               ),
                             ),
                             child: _isLoading
-                                ? const CircularProgressIndicator(color: ThemeColor.white) //
+                                ? const CircularProgressIndicator(
+                                    color: ThemeColor.white) //
                                 : const Text('Login',
                                     style: TextStyle(
                                       color: ThemeColor.white,
