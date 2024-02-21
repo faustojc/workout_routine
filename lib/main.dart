@@ -27,6 +27,13 @@ class MainApp extends StatelessWidget {
         title: 'Strength and Conditioning',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: ThemeColor.primary),
+          checkboxTheme: CheckboxThemeData(
+            side: const BorderSide(color: ThemeColor.white, width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+              side: const BorderSide(color: ThemeColor.white, width: 2),
+            ),
+          ),
           useMaterial3: true,
         ),
         onGenerateRoute: Routes.generateRoute,
