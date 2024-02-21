@@ -14,13 +14,15 @@ class ProfileMenu extends StatefulWidget {
 }
 
 class _ProfileMenuState extends State<ProfileMenu> {
-  bool isLoading = false;
+  bool _isLoading = false;
 
   void _logout(BuildContext context) async {
-    isLoading = true;
+    setState(() => _isLoading = true);
 
+    await database.disconnectAndClear();
     await supabase.auth.signOut();
-    await database.disconnectAndClear().then((value) => isLoading = false);
+
+    setState(() => _isLoading = false);
 
     if (!context.mounted) return;
 
@@ -30,12 +32,17 @@ class _ProfileMenuState extends State<ProfileMenu> {
   @override
   Widget build(BuildContext context) => Container(
         color: ThemeColor.primary,
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text("PROFILE MENU", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+              const SizedBox(height: 20),
+              const Text("PROFILE MENU",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white)),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -49,7 +56,8 @@ class _ProfileMenuState extends State<ProfileMenu> {
                           radius: 40,
                           backgroundColor: Colors.white,
                           child: Text(
-                            AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                            AthleteModel.current!.firstName.characters.first +
+                                AthleteModel.current!.lastName.characters.first,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 20,
@@ -57,13 +65,19 @@ class _ProfileMenuState extends State<ProfileMenu> {
                             ),
                           ),
                         ),
-                        const VerticalDivider(color: ThemeColor.tertiary, thickness: 2),
+                        const VerticalDivider(
+                            color: ThemeColor.tertiary, thickness: 2),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("Joined", style: TextStyle(color: ThemeColor.tertiary)),
+                            const Text("Joined",
+                                style: TextStyle(color: ThemeColor.tertiary)),
                             const SizedBox(height: 5),
-                            Text(DateFormat.yMMMMd().format(AthleteModel.current!.createdAt), style: const TextStyle(color: ThemeColor.white)),
+                            Text(
+                                DateFormat.yMMMMd()
+                                    .format(AthleteModel.current!.createdAt),
+                                style:
+                                    const TextStyle(color: ThemeColor.white)),
                           ],
                         )
                       ],
@@ -92,7 +106,10 @@ class _ProfileMenuState extends State<ProfileMenu> {
               const SizedBox(height: 30),
               const Text(
                 "Account Settings",
-                style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: ThemeColor.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Container(
@@ -103,26 +120,38 @@ class _ProfileMenuState extends State<ProfileMenu> {
                 child: Column(
                   children: [
                     ListTile(
-                      onTap: () => Routes.to(context, RouteList.personalDetails, 'right'),
-                      leading: const Icon(Icons.person, color: ThemeColor.white),
-                      title: const Text("Personal Details", style: TextStyle(color: ThemeColor.white)),
-                      trailing: const Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      onTap: () => Routes.to(
+                          context, RouteList.personalDetails, 'right'),
+                      leading:
+                          const Icon(Icons.person, color: ThemeColor.white),
+                      title: const Text("Personal Details",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: const Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                     const ListTile(
                       leading: Icon(Icons.lock, color: ThemeColor.white),
-                      title: Text("Email and Password", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      title: Text("Email and Password",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                     const ListTile(
                       leading: Icon(Icons.settings, color: ThemeColor.white),
-                      title: Text("Settings", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      title: Text("Settings",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                     ListTile(
-                      onTap: () => Routes.to(context, RouteList.measureUnits, "right"),
-                      leading: const Icon(Icons.straighten, color: ThemeColor.white),
-                      title: const Text("Units of Measure", style: TextStyle(color: ThemeColor.white)),
-                      trailing: const Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      onTap: () =>
+                          Routes.to(context, RouteList.measureUnits, "right"),
+                      leading:
+                          const Icon(Icons.straighten, color: ThemeColor.white),
+                      title: const Text("Units of Measure",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: const Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                   ],
                 ),
@@ -137,13 +166,17 @@ class _ProfileMenuState extends State<ProfileMenu> {
                   children: [
                     ListTile(
                       leading: Icon(Icons.privacy_tip, color: ThemeColor.white),
-                      title: Text("Privacy Policy", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      title: Text("Privacy Policy",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                     ListTile(
                       leading: Icon(Icons.gavel, color: ThemeColor.white),
-                      title: Text("Terms & Conditions", style: TextStyle(color: ThemeColor.white)),
-                      trailing: Icon(Icons.arrow_forward_ios, color: ThemeColor.white),
+                      title: Text("Terms & Conditions",
+                          style: TextStyle(color: ThemeColor.white)),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          color: ThemeColor.white),
                     ),
                   ],
                 ),
@@ -154,15 +187,19 @@ class _ProfileMenuState extends State<ProfileMenu> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeColor.secondary,
                     padding: const EdgeInsets.symmetric(horizontal: 30),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: isLoading
+                  child: _isLoading
                       ? const CircularProgressIndicator(color: ThemeColor.white)
                       : const Text(
                           "Logout",
-                          style: TextStyle(color: ThemeColor.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: ThemeColor.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
                         )),
-              const SizedBox(height: 20)
+              const SizedBox(height: 40)
             ],
           ),
         ),
