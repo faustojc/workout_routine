@@ -29,7 +29,9 @@ class _NotificationListViewState extends State<NotificationListView> {
             ),
             const SizedBox(height: 20),
             (NotificationModel.list.isEmpty)
-                ? const EmptyContent(title: "No notifications as of the moment", icon: Icons.notifications_off)
+                ? const Expanded(
+                    child: EmptyContent(title: "No notifications as of the moment", icon: Icons.notifications_off),
+                  )
                 : Expanded(
                     child: ListView.builder(
                       itemCount: NotificationModel.list.length,
