@@ -3,12 +3,16 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class StatusAlertDialog extends StatefulWidget {
+  final Widget title;
   final Widget currentStatusIndicator;
   final String currentStatusText;
+  final String? buttonText;
 
   const StatusAlertDialog({
     required this.currentStatusIndicator,
     required this.currentStatusText,
+    required this.title,
+    this.buttonText,
     super.key,
   });
 
@@ -43,6 +47,12 @@ class _StatusAlertDialogState extends State<StatusAlertDialog> {
               ),
             ],
           ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(widget.buttonText ?? "OK"),
+            ),
+          ],
         ),
       ),
     );
