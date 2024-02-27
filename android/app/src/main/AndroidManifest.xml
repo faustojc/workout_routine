@@ -33,7 +33,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
                 <data
-                    android:host="login-callback"
+                    android:host="verification/confirm"
                     android:scheme="io.supabase.strength-conditioning" />
             </intent-filter>
         </activity>
