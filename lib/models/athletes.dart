@@ -111,7 +111,7 @@ class AthleteModel {
     List<String> placeholders = [];
 
     fields.forEach((key, value) {
-      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
+      value = ((key == 'birthday' || key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
 
       columns.add(key);
       values.add(value);
