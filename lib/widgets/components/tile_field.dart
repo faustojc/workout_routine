@@ -6,9 +6,9 @@ class TileField extends StatelessWidget {
   final String title;
 
   const TileField({
-    super.key,
     required this.leading,
     required this.title,
+    super.key,
   });
 
   @override
