@@ -47,6 +47,7 @@ dependencies:
   logging: ^1.2.0
   auto_size_text: ^3.0.0
   video_player: ^2.8.2
+  uni_links: ^0.5.1
 
 dev_dependencies:
   flutter_test:
