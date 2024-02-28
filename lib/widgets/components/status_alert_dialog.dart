@@ -6,13 +6,13 @@ class StatusAlertDialog extends StatefulWidget {
   final Widget title;
   final Widget currentStatusIndicator;
   final String currentStatusText;
-  final String? buttonText;
+  final List<Widget>? actions;
 
   const StatusAlertDialog({
     required this.currentStatusIndicator,
     required this.currentStatusText,
     required this.title,
-    this.buttonText,
+    this.actions,
     super.key,
   });
 
@@ -27,32 +27,29 @@ class _StatusAlertDialogState extends State<StatusAlertDialog> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
         child: AlertDialog(
+          title: widget.title,
           alignment: Alignment.center,
           content: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 30),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                 switchOutCurve: Curves.easeOut,
                 child: widget.currentStatusIndicator,
               ),
-              const SizedBox(width: 20),
+              const SizedBox(height: 30),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                 switchOutCurve: Curves.easeOut,
-                child: Text(widget.currentStatusText),
+                child: Text(widget.currentStatusText, style: const TextStyle(fontSize: 17)),
               ),
             ],
           ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(widget.buttonText ?? "OK"),
-            ),
-          ],
+          actions: widget.actions,
         ),
       ),
     );
