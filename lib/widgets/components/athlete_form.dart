@@ -1,8 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:powersync/sqlite3.dart';
+import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
 import 'package:workout_routine/themes/colors.dart';
+import 'package:workout_routine/widgets/components/toast.dart';
 
 import 'input_form_field.dart';
 
@@ -16,7 +19,7 @@ class AthleteForm extends StatefulWidget {
   State<AthleteForm> createState() => _AthleteFormState();
 }
 
-class _AthleteFormState extends State<AthleteForm> {
+class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -39,6 +42,8 @@ class _AthleteFormState extends State<AthleteForm> {
     _birthdayController.dispose();
     _weightController.dispose();
     _heightController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
 
     super.dispose();
   }
@@ -70,7 +75,8 @@ class _AthleteFormState extends State<AthleteForm> {
 
   Future<void> _register(BuildContext context) async {
     if (_formKey.currentState!.validate() && isAgreed) {
-      AthleteModel.create({
+      await AthleteModel.create({
+        "userId": user.id,
         "firstName": _firstNameController.text.trim(),
         "lastName": _lastNameController.text.trim(),
         "sex": _sex,
@@ -80,8 +86,12 @@ class _AthleteFormState extends State<AthleteForm> {
         "age": int.parse(_ageController.text.trim()),
         "city": _cityController.text.trim(),
         "address": _addressController.text.trim(),
-        "createdAt": DateTime.now().toIso8601String(),
-        "updatedAt": DateTime.now().toIso8601String(),
+        "createdAt": DateTime.now(),
+        "updatedAt": DateTime.now(),
+      }).then((ResultSet? value) {
+        widget.onSuccess();
+      }).onError((error, _) {
+        showToast(context: context, message: error.toString(), type: ToastType.error, vsync: this, dismissible: true);
       });
     }
   }
@@ -269,12 +279,7 @@ class _AthleteFormState extends State<AthleteForm> {
                 const SizedBox(height: 40),
                 FilledButton(
                   onPressed: () => _register(context),
-                  child: const Text(
-                    'Register',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
+                  child: const Text('Register', style: TextStyle(fontSize: 18)),
                 ),
                 const SizedBox(height: 20)
               ],
