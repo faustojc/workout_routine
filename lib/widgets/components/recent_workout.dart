@@ -74,7 +74,7 @@ class _RecentWorkoutState extends State<RecentWorkout> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
-          image: NetworkImage(currWorkout.thumbnailUrl),
+          image: NetworkImage(currWorkout.thumbnailUrl!),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken),
         ),
