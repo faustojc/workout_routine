@@ -1,17 +1,18 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:workout_routine/themes/colors.dart';
 
 class StatusAlertDialog extends StatefulWidget {
-  final Widget title;
-  final Widget currentStatusIndicator;
-  final String currentStatusText;
+  final Widget? title;
+  final Widget? statusIndicator;
+  final String statusMessage;
   final List<Widget>? actions;
 
   const StatusAlertDialog({
-    required this.currentStatusIndicator,
-    required this.currentStatusText,
-    required this.title,
+    required this.statusMessage,
+    this.title,
+    this.statusIndicator,
     this.actions,
     super.key,
   });
@@ -22,36 +23,45 @@ class StatusAlertDialog extends StatefulWidget {
 
 class _StatusAlertDialogState extends State<StatusAlertDialog> {
   @override
-  Widget build(BuildContext context) {
-    return AbsorbPointer(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: AlertDialog(
-          title: widget.title,
-          alignment: Alignment.center,
-          content: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 30),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                switchOutCurve: Curves.easeOut,
-                child: widget.currentStatusIndicator,
+  Widget build(BuildContext context) => Stack(
+        children: [
+          AbsorbPointer(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
               ),
-              const SizedBox(height: 30),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                switchOutCurve: Curves.easeOut,
-                child: Text(widget.currentStatusText, style: const TextStyle(fontSize: 17)),
-              ),
-            ],
+            ),
           ),
-          actions: widget.actions,
-        ),
-      ),
-    );
-  }
+          AlertDialog(
+              title: widget.title,
+              alignment: Alignment.center,
+              backgroundColor: ThemeColor.grey,
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 30),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                    switchOutCurve: Curves.easeOut,
+                    child: widget.statusIndicator,
+                  ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                    switchOutCurve: Curves.easeOut,
+                    child: Text(widget.statusMessage, textAlign: TextAlign.center, style: const TextStyle(color: ThemeColor.white, fontSize: 14)),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: widget.actions ?? [const SizedBox.shrink()],
+                ),
+              ]),
+        ],
+      );
 }

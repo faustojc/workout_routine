@@ -19,6 +19,7 @@ class InputFormField extends StatefulWidget {
   final FieldDecoration decoration;
   final IconData? icon;
   final IconData? suffixIcon;
+  final Color suffixIconColor;
   final String? label;
   final TextStyle? labelStyle;
   final String? hint;
@@ -43,6 +44,7 @@ class InputFormField extends StatefulWidget {
     this.onTap,
     this.icon,
     this.suffixIcon,
+    this.suffixIconColor = ThemeColor.primary,
     this.fillColor,
   });
 
@@ -66,7 +68,7 @@ class _InputFormFieldState extends State<InputFormField> {
     _controller = widget.controller ?? TextEditingController();
 
     if (widget.suffixIcon != null) {
-      _suffixIcon = Icon(widget.suffixIcon, color: ThemeColor.white);
+      _suffixIcon = Icon(widget.suffixIcon);
     } else {
       _suffixIcon = null;
     }
@@ -77,12 +79,12 @@ class _InputFormFieldState extends State<InputFormField> {
         setState(() {
           if (widget.type == FieldType.password) {
             _suffixIcon = IconButton(
-              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off, color: ThemeColor.white),
+              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
               onPressed: _setObscureText,
             );
           } else if (widget.type == FieldType.text && _controller.text.isNotEmpty) {
             _suffixIcon = IconButton(
-              icon: const Icon(Icons.clear, color: ThemeColor.white),
+              icon: const Icon(Icons.clear),
               onPressed: _clearText,
             );
           }
@@ -106,7 +108,7 @@ class _InputFormFieldState extends State<InputFormField> {
     setState(() {
       _obscureText = !_obscureText;
       _suffixIcon = IconButton(
-        icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off, color: ThemeColor.white),
+        icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
         onPressed: _setObscureText,
       );
     });
@@ -114,9 +116,7 @@ class _InputFormFieldState extends State<InputFormField> {
 
   void _clearText() {
     widget.controller!.clear();
-    setState(() {
-      _suffixIcon = null;
-    });
+    setState(() => _suffixIcon = null);
   }
 
   @override
@@ -129,6 +129,7 @@ class _InputFormFieldState extends State<InputFormField> {
       decoration: InputDecoration(
         prefixIcon: widget.icon != null ? Icon(widget.icon, color: ThemeColor.white) : null,
         suffixIcon: _suffixIcon,
+        suffixIconColor: widget.suffixIconColor,
         labelText: widget.label,
         hintText: widget.hint,
         filled: widget.decoration == FieldDecoration.filled || widget.decoration == FieldDecoration.borderless,
