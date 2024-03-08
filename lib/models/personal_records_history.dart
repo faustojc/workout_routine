@@ -1,8 +1,8 @@
-import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/models/base_model.dart';
 
-class PRHistoryModel {
-  static const String table = "personal_records_history";
+class PRHistoryModel extends BaseModel {
+  static const String _table = "personal_records_history";
 
   final String id;
   final String prId;
@@ -52,60 +52,24 @@ class PRHistoryModel {
       };
 
   static Future<List<PRHistoryModel>> getAllByUserId(String userId) async {
-    final results = await database.getAll("SELECT * FROM $table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
+    final results = await database.getAll("SELECT * FROM $_table WHERE userId = ? ORDER BY createdAt DESC", [userId]);
 
     return PRHistoryModel.fromList(results);
   }
 
   static Future<PRHistoryModel> getSingle(String id, String prId, String userId) async {
-    final results = await database.get("SELECT * FROM $table WHERE id = ? AND prId = ? AND userId = ?", [id, prId, userId]);
+    final results = await database.get("SELECT * FROM $_table WHERE id = ? AND prId = ? AND userId = ?", [id, prId, userId]);
 
     return PRHistoryModel.fromJson(results);
   }
 
   static Stream<List<PRHistoryModel>> watch(String userId) {
-    return database.watch("SELECT * FROM $table WHERE userId = $userId ORDER BY createdAt DESC").map(//
+    return database.watch("SELECT * FROM $_table WHERE userId = $userId ORDER BY createdAt DESC").map(//
         (results) => results.map((row) => PRHistoryModel.fromJson(row)).toList() //
         );
   }
 
-  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
-    if (fields.isEmpty) return null;
-
-    List<String> columns = [];
-    List<String> values = [];
-    List<String> placeholders = [];
-
-    fields.forEach((key, value) {
-      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
-
-      columns.add(key);
-      values.add(value);
-      placeholders.add("?");
-    });
-
-    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
-    return await database.execute(sql, values);
-  }
-
-  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
-    if (fields.isEmpty) return null;
-
-    List<String> updates = [];
-    List<dynamic> values = [];
-
-    fields.forEach((key, value) {
-      updates.add("$key = ?");
-      values.add(value);
-    });
-
-    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
-    values.add(id);
-
-    return await database.execute(sql, values);
-  }
-
-  static Future<ResultSet> delete(String id) async {
-    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
-  }
+  @override
+  // TODO: implement tableName
+  String get tableName => _table;
 }
