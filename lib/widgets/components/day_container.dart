@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_routine/models/days.dart';
 import 'package:workout_routine/models/user_workouts.dart';
 import 'package:workout_routine/models/workouts.dart';
+import 'package:workout_routine/routes.dart';
 import 'package:workout_routine/themes/colors.dart';
 
 class DayContainer extends StatefulWidget {
@@ -27,7 +28,7 @@ class _DayContainerState extends State<DayContainer> {
 
     _workouts = WorkoutModel.list.where((workout) => workout.daysId == widget.day.id).toList();
 
-    if (WorkoutModel.list.isNotEmpty) {
+    if (_workouts.isNotEmpty && UserWorkoutModel.list.isNotEmpty) {
       _userWorkout = UserWorkoutModel.list.firstWhere((userWorkout) => _workouts.any((workout) => workout.id == userWorkout.workoutId));
 
       // set the color, icon and border based on the status of the user workout
@@ -48,28 +49,35 @@ class _DayContainerState extends State<DayContainer> {
             widget.day.title,
             style: const TextStyle(fontSize: 14, color: ThemeColor.white),
           ),
-          Container(
-            width: 65,
-            height: 100,
-            margin: const EdgeInsets.only(right: 5),
-            decoration: BoxDecoration(
-              color: _color,
-              borderRadius: BorderRadius.circular(12),
+          GestureDetector(
+            onTap: () {
+              WorkoutModel.list = _workouts;
+              WorkoutModel.current = _workouts.first;
+              Routes.to(context, RouteList.workout_type);
+            },
+            child: Container(
+              width: 65,
+              height: 100,
+              margin: const EdgeInsets.only(right: 5),
+              decoration: BoxDecoration(
+                color: _color,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: (_userWorkout != null && _userWorkout!.status == "complete")
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _icon!,
+                        const SizedBox(height: 5),
+                        AutoSizeText(
+                          _userWorkout!.status,
+                          style: const TextStyle(fontSize: 12, color: ThemeColor.white),
+                        ),
+                      ],
+                    )
+                  : const Icon(Icons.play_circle, color: ThemeColor.primary, size: 50),
             ),
-            child: (_userWorkout != null && _userWorkout!.status == "complete")
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _icon!,
-                      const SizedBox(height: 5),
-                      AutoSizeText(
-                        _userWorkout!.status,
-                        style: const TextStyle(fontSize: 12, color: ThemeColor.white),
-                      ),
-                    ],
-                  )
-                : const Icon(Icons.play_circle, color: ThemeColor.primary),
-          ),
+          )
         ],
       );
 }
