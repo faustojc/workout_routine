@@ -1,7 +1,8 @@
 import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/models/base_model.dart';
 
-class WeekModel {
-  static const String table = "weeks";
+class WeekModel extends BaseModel {
+  static const String _table = "weeks";
 
   final String id;
   final String periodizationId;
@@ -53,41 +54,24 @@ class WeekModel {
       };
 
   static Future<List<WeekModel>> getAll() async {
-    final results = await database.getAll("SELECT * FROM $table");
+    final results = await database.getAll("SELECT * FROM $_table");
 
     return results.map((row) => WeekModel.fromJson(row)).toList();
   }
 
   static Future<List<WeekModel>> getAllByPeriodizationId(String periodizationId) async {
-    final results = await database.getAll("SELECT * FROM $table WHERE periodizationId = '$periodizationId'");
+    final results = await database.getAll("SELECT * FROM $_table WHERE periodizationId = '$periodizationId'");
 
     return results.map((row) => WeekModel.fromJson(row)).toList();
   }
 
   static Future<WeekModel> getSingle(String id) async {
-    final result = await database.get("SELECT * FROM $table WHERE id = '$id'");
+    final result = await database.get("SELECT * FROM $_table WHERE id = '$id'");
 
     return WeekModel.fromJson(result);
   }
 
-  static Future<void> create(String periodizationId, String title, String? subtitle) async {
-    await database.execute(
-      "INSERT INTO $table (periodizationId, title, subtitle, createdAt) VALUES (?, ?, ?, ?)",
-      [periodizationId, title, subtitle, DateTime.now()],
-    );
-  }
-
-  static Future<void> update(String id, String title, String? subtitle) async {
-    await database.execute(
-      "UPDATE $table SET title = ?, subtitle = ?, updatedAt = ? WHERE id = ?",
-      [title, subtitle, DateTime.now(), id],
-    );
-  }
-
-  static Future<void> delete(String id) async {
-    await database.execute(
-      "DELETE FROM $table WHERE id = ?",
-      [id],
-    );
-  }
+  @override
+  // TODO: implement tableName
+  String get tableName => _table;
 }

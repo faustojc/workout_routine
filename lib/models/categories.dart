@@ -1,4 +1,8 @@
-class CategoryModel {
+import 'package:workout_routine/models/base_model.dart';
+
+class CategoryModel extends BaseModel {
+  static const String _table = "categories";
+
   final String id;
   final String name;
   final DateTime createdAt;
@@ -39,4 +43,7 @@ class CategoryModel {
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };
+
+  @override
+  String get tableName => _table;
 }

@@ -1,8 +1,8 @@
-import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/backend/powersync.dart';
+import 'package:workout_routine/models/base_model.dart';
 
-class SubscriptionModel {
-  static const String table = "subscriptions";
+class SubscriptionModel extends BaseModel {
+  static const String _table = "subscriptions";
 
   final String id;
   final String userId;
@@ -59,60 +59,23 @@ class SubscriptionModel {
       };
 
   static Future<SubscriptionModel> getSingle(String id, String userId) async {
-    final results = await database.get("SELECT * FROM $table WHERE id = ? AND userId = ?", [id, userId]);
+    final results = await database.get("SELECT * FROM $_table WHERE id = ? AND userId = ?", [id, userId]);
 
     return SubscriptionModel.fromJson(results);
   }
 
   static Future<SubscriptionModel> getSingleByUserId(String userId) async {
-    final results = await database.get("SELECT * FROM $table WHERE userId = ?", [userId]);
+    final results = await database.get("SELECT * FROM $_table WHERE userId = ?", [userId]);
 
     return SubscriptionModel.fromJson(results);
   }
 
   static Future<SubscriptionModel> watch(String userId) async {
-    final result = await database.watch("SELECT * FROM $table WHERE userId = ? LIMIT 1", parameters: [userId]).first.then((value) => value.first);
+    final result = await database.watch("SELECT * FROM $_table WHERE userId = ? LIMIT 1", parameters: [userId]).first.then((value) => value.first);
 
     return SubscriptionModel.fromJson(result);
   }
 
-  static Future<ResultSet?> create(Map<String, dynamic> fields) async {
-    if (fields.isEmpty) return null;
-
-    List<String> columns = [];
-    List<String> values = [];
-    List<String> placeholders = [];
-
-    fields.forEach((key, value) {
-      value = ((key == 'createdAt' || key == 'updatedAt') && value is DateTime) ? value.toIso8601String() : value;
-
-      columns.add(key);
-      values.add(value);
-      placeholders.add("?");
-    });
-
-    String sql = "INSERT INTO $table (${columns.join(', ')}) VALUES (${placeholders.join(', ')})";
-    return await database.execute(sql, values);
-  }
-
-  static Future<ResultSet?> update(String id, Map<String, dynamic> fields) async {
-    if (fields.isEmpty) return null;
-
-    List<String> updates = [];
-    List<dynamic> values = [];
-
-    fields.forEach((key, value) {
-      updates.add("$key = ?");
-      values.add(value);
-    });
-
-    String sql = "UPDATE $table SET ${updates.join(', ')} WHERE id = ?";
-    values.add(id);
-
-    return await database.execute(sql, values);
-  }
-
-  static Future<ResultSet> delete(String id) async {
-    return await database.execute("DELETE FROM $table WHERE id = ?", [id]);
-  }
+  @override
+  String get tableName => _table;
 }
