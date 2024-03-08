@@ -32,8 +32,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _connectionStatus.addListener(() {
       if (_connectionStatus.status == InternetStatus.disconnected) {
         showToast(context: context, message: "No connection", type: ToastType.info, vsync: this);
-      } else {
-        showToast(context: context, message: "Internet connection restored", type: ToastType.success, vsync: this);
       }
     });
 
@@ -60,9 +58,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   void _setPage(int value) => setState(() => _currentIndex = value);
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         backgroundColor: ThemeColor.primary,
         resizeToAvoidBottomInset: true,
         floatingActionButton: FloatingActionButton(
@@ -98,71 +94,71 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         body: Container(
             height: MediaQuery.of(context).size.height,
             color: ThemeColor.primary,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                SingleChildScrollView(
-                    padding: const EdgeInsets.only(right: 15, left: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ListTile(
-                          title: const Text(
-                            'WELCOME,',
-                            style: TextStyle(color: ThemeColor.tertiary, fontSize: 12),
-                          ),
-                          subtitle: Text(
-                            AthleteModel.current!.firstName.toUpperCase(),
-                            style: const TextStyle(
-                              color: ThemeColor.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
+            child: SafeArea(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  SingleChildScrollView(
+                      padding: const EdgeInsets.only(right: 15, left: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ListTile(
+                            title: const Text(
+                              'WELCOME,',
+                              style: TextStyle(color: ThemeColor.tertiary, fontSize: 12),
                             ),
-                          ),
-                          trailing: CircleAvatar(
-                            backgroundColor: ThemeColor.white,
-                            child: Text(
-                              AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                            subtitle: Text(
+                              AthleteModel.current!.firstName.toUpperCase(),
                               style: const TextStyle(
-                                color: ThemeColor.secondary,
-                                fontWeight: FontWeight.bold,
+                                color: ThemeColor.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            trailing: CircleAvatar(
+                              backgroundColor: ThemeColor.white,
+                              child: Text(
+                                AthleteModel.current!.firstName.characters.first + AthleteModel.current!.lastName.characters.first,
+                                style: const TextStyle(
+                                  color: ThemeColor.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        const Text(
-                          'RECENT WORKOUT',
-                          style: TextStyle(
-                            color: ThemeColor.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                          const SizedBox(height: 15),
+                          const Text(
+                            'RECENT WORKOUT',
+                            style: TextStyle(
+                              color: ThemeColor.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        const RecentWorkout(),
-                        const SizedBox(height: 30),
-                        const Text(
-                          'RECENT PERSONAL RECORDS',
-                          style: TextStyle(
-                            color: ThemeColor.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                          const SizedBox(height: 15),
+                          const RecentWorkout(),
+                          const SizedBox(height: 30),
+                          const Text(
+                            'RECENT PERSONAL RECORDS',
+                            style: TextStyle(
+                              color: ThemeColor.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        const PersonalRecordsGrid(),
-                        const SizedBox(height: 30),
-                      ],
-                    )),
-                const PRHome(),
-                const StartWorkoutPage(),
-                const NotificationListView(),
-                const ProfileMenu(),
-              ],
+                          const SizedBox(height: 20),
+                          const PersonalRecordsGrid(),
+                          const SizedBox(height: 30),
+                        ],
+                      )),
+                  const PRHome(),
+                  const StartWorkoutPage(),
+                  const NotificationListView(),
+                  const ProfileMenu(),
+                ],
+              ),
             )),
-      ),
-    );
-  }
+      );
 }
