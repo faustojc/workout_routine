@@ -28,6 +28,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   Widget build(BuildContext context) => FutureBuilder(
       future: _fetchData,
       builder: (context, snapshot) {
-        return Container();
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Dashboard'),
+          ),
+        );
       });
 }

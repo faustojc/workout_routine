@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:workout_routine/widgets/admin/dashboard.dart';
 import 'package:workout_routine/widgets/auth/login.dart';
 import 'package:workout_routine/widgets/auth/register.dart';
-import 'package:workout_routine/widgets/user/edit_profile.dart';
 import 'package:workout_routine/widgets/user/home.dart';
 import 'package:workout_routine/widgets/user/personal_records/pr_home.dart';
-import 'package:workout_routine/widgets/user/profile.dart';
 import 'package:workout_routine/widgets/user/profile/measure_units.dart';
+import 'package:workout_routine/widgets/user/profile/personal_details.dart';
 import 'package:workout_routine/widgets/workouts/periodization_page.dart';
 import 'package:workout_routine/widgets/workouts/start_workout_page.dart';
 import 'package:workout_routine/widgets/workouts/workout_page.dart';
+import 'package:workout_routine/widgets/workouts/workout_type_page.dart';
 
 enum RouteList {
   home,
   login,
   register,
-  profile,
-  editProfile,
+  personalDetails,
+  editPersonalDetails,
   startWorkout,
+  workout_type,
   periodization,
   workouts,
-  personal_record,
+  personalRecord,
   measureUnits,
+  dashboard,
 }
 
 extension RouteListExtension on RouteList {
@@ -32,20 +35,24 @@ extension RouteListExtension on RouteList {
         return '/login';
       case RouteList.register:
         return '/register';
-      case RouteList.profile:
-        return '/profile';
-      case RouteList.editProfile:
-        return '/edit_profile';
+      case RouteList.personalDetails:
+        return '/personal_details';
+      case RouteList.editPersonalDetails:
+        return '/edit_personal_details';
       case RouteList.startWorkout:
         return '/start_workout';
       case RouteList.periodization:
         return '/periodization';
       case RouteList.workouts:
         return '/workouts';
-      case RouteList.personal_record:
+      case RouteList.workout_type:
+        return 'workout_type';
+      case RouteList.personalRecord:
         return '/personal_record';
       case RouteList.measureUnits:
         return '/measure_units';
+      case RouteList.dashboard:
+        return '/dashboard';
     }
   }
 }
@@ -54,15 +61,16 @@ class Routes {
   // List of routes
   static final Map<RouteList, WidgetBuilder> _routes = {
     RouteList.home: (_) => const Home(),
-    RouteList.login: (_) => const LoginForm(),
-    RouteList.register: (_) => const RegisterForm(),
-    RouteList.profile: (_) => const Profile(),
-    RouteList.editProfile: (_) => const EditProfile(),
+    RouteList.login: (_) => const Login(),
+    RouteList.register: (_) => const Register(),
     RouteList.startWorkout: (_) => const StartWorkoutPage(),
     RouteList.periodization: (_) => const PeriodizationPage(),
     RouteList.workouts: (_) => const WorkoutPage(),
-    RouteList.personal_record: (_) => const PRHome(),
+    RouteList.workout_type: (_) => const WorkoutTypePage(),
+    RouteList.personalRecord: (_) => const PRHome(),
     RouteList.measureUnits: (_) => const MeasureUnits(),
+    RouteList.personalDetails: (_) => const PersonalDetails(),
+    RouteList.dashboard: (_) => const Dashboard(),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -82,7 +90,7 @@ class Routes {
     );
   }
 
-  static void to(BuildContext context, RouteList routeName, String direction) {
+  static void to(BuildContext context, RouteList routeName, {String? direction}) {
     Route route = PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => _routes[routeName]!(context),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
