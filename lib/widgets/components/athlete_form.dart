@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:powersync/sqlite3.dart';
 import 'package:workout_routine/data/client.dart';
 import 'package:workout_routine/models/athletes.dart';
+import 'package:workout_routine/models/roles.dart';
+import 'package:workout_routine/models/subscriptions.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
 
@@ -32,7 +34,8 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
 
   String? _sex = "";
   DateTime? _birthday;
-  bool isAgreed = false;
+  bool _isAgreed = false;
+  bool _submitted = false;
 
   @override
   void dispose() {
@@ -74,21 +77,37 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
   }
 
   Future<void> _register(BuildContext context) async {
-    if (_formKey.currentState!.validate() && isAgreed) {
-      await AthleteModel.create({
-        "userId": user.id,
-        "firstName": _firstNameController.text.trim(),
-        "lastName": _lastNameController.text.trim(),
-        "sex": _sex,
-        "height": double.parse(_heightController.text.trim()),
-        "weight": double.parse(_weightController.text.trim()),
-        "birthday": _birthday,
-        "age": int.parse(_ageController.text.trim()),
-        "city": _cityController.text.trim(),
-        "address": _addressController.text.trim(),
-        "createdAt": DateTime.now(),
-        "updatedAt": DateTime.now(),
-      }).then((ResultSet? value) {
+    setState(() => _submitted = true);
+
+    if (_formKey.currentState!.validate() && _isAgreed) {
+      AthleteModel athleteData = AthleteModel.fromJson({
+        'userId': user.id,
+        'firstName': _firstNameController.text.trim(),
+        'lastName': _lastNameController.text.trim(),
+        'sex': _sex!.trim(),
+        'city': _cityController.text.trim(),
+        'address': _addressController.text.trim(),
+        'age': int.parse(_ageController.text.trim()),
+        'weight': double.parse(_weightController.text.trim()),
+        'height': double.parse(_heightController.text.trim()),
+        'birthday': _birthday!,
+      });
+
+      RoleModel roleData = RoleModel.fromJson({
+        'userId': user.id,
+        'name': 'user',
+      });
+
+      SubscriptionModel subscriptionData = SubscriptionModel.fromJson({
+        'userId': user.id,
+        'isSubscribed': false,
+      });
+
+      await athleteData.create(athleteData.toJson()).then((ResultSet? value) async {
+        AthleteModel.current = AthleteModel.fromJson(value!.first);
+        RoleModel.current = await roleData.create(roleData.toJson()).then((ResultSet? value) => RoleModel.fromJson(value!.first));
+        SubscriptionModel.current = await subscriptionData.create(subscriptionData.toJson()).then((ResultSet? value) => SubscriptionModel.fromJson(value!.first));
+
         widget.onSuccess();
       }).onError((error, _) {
         showToast(context: context, message: error.toString(), type: ToastType.error, vsync: this, dismissible: true);
@@ -97,14 +116,26 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+  Widget build(BuildContext context) => Container(
+        color: ThemeColor.black,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: CircleAvatar(
+                    backgroundColor: ThemeColor.primary,
+                    child: IconButton(
+                      color: ThemeColor.black,
+                      onPressed: () => widget.onBack(),
+                      icon: const Icon(Icons.arrow_back, color: ThemeColor.black),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
                 const AutoSizeText(
                   "ATHLETE INFORMATION",
@@ -144,43 +175,32 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
                   validator: (value) => value!.isEmpty ? "Last name is required" : null,
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white,
-                      ),
-                    ),
+                DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  hint: const Text("Select your sex", style: TextStyle(color: ThemeColor.tertiary)),
+                  dropdownColor: ThemeColor.secondary,
+                  icon: const Icon(Icons.arrow_drop_down, color: ThemeColor.white),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
                   ),
-                  child: DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    hint: const Text("Select your sex", style: TextStyle(color: ThemeColor.tertiary)),
-                    dropdownColor: ThemeColor.secondary,
-                    icon: const Icon(Icons.arrow_drop_down, color: ThemeColor.white),
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      border: InputBorder.none,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'Male',
+                      child: Text('Male', style: TextStyle(color: ThemeColor.white)),
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Male',
-                        child: Text('Male', style: TextStyle(color: ThemeColor.white)),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Female',
-                        child: Text('Female', style: TextStyle(color: ThemeColor.white)),
-                      ),
-                    ],
-                    onChanged: (String? value) {
-                      if (value != null) {
-                        setState(() => _sex = value);
-                      }
-                    },
-                    validator: (value) => value!.isEmpty ? "Please select your sex" : null,
-                  ),
+                    DropdownMenuItem(
+                      value: 'Female',
+                      child: Text('Female', style: TextStyle(color: ThemeColor.white)),
+                    ),
+                  ],
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      setState(() => _sex = value);
+                    }
+                  },
+                  validator: (value) => value == null ? "Please select your sex" : null,
                 ),
                 const SizedBox(height: 20),
                 InputFormField(
@@ -257,8 +277,8 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
                 ),
                 const SizedBox(height: 20),
                 CheckboxListTile(
-                  value: isAgreed,
-                  onChanged: (value) => setState(() => isAgreed = value!),
+                  value: _isAgreed,
+                  onChanged: (value) => setState(() => _isAgreed = value!),
                   title: const Text(
                     "I agree to the terms and conditions by signing up.",
                     style: TextStyle(color: Colors.white),
@@ -267,7 +287,7 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
                   checkColor: ThemeColor.primary,
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
-                (isAgreed
+                (_isAgreed || !_submitted
                     ? const SizedBox.shrink()
                     : const Padding(
                         padding: EdgeInsets.only(top: 10),
@@ -279,7 +299,14 @@ class _AthleteFormState extends State<AthleteForm> with TickerProviderStateMixin
                 const SizedBox(height: 40),
                 FilledButton(
                   onPressed: () => _register(context),
-                  child: const Text('Register', style: TextStyle(fontSize: 18)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeColor.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                  ),
+                  child: const Text('Register', style: TextStyle(color: ThemeColor.black, fontSize: 20)),
                 ),
                 const SizedBox(height: 20)
               ],

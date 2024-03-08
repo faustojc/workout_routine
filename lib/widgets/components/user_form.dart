@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workout_routine/data/client.dart';
-import 'package:workout_routine/services/auth_state_provider.dart';
 import 'package:workout_routine/themes/colors.dart';
 import 'package:workout_routine/widgets/components/status_alert_dialog.dart';
 import 'package:workout_routine/widgets/components/toast.dart';
@@ -27,9 +25,6 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
   final _passwordController = TextEditingController();
 
   final OverlayPortalController _overlayController = OverlayPortalController();
-
-  late Widget _statusIndicator = const CircularProgressIndicator(color: ThemeColor.white);
-  late String _status = '';
   bool _isLoading = false;
 
   String? _validateEmail(String? value) {
@@ -58,13 +53,19 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
 
     _emailController.dispose();
     _passwordController.dispose();
-
-    Provider.of<AuthStateProvider>(context, listen: false).removeListener(_verificationListener);
   }
 
   Future<void> _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
+      FocusManager.instance.primaryFocus?.unfocus();
+
       setState(() => _isLoading = true);
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      _overlayController.show();
+
+      return;
 
       await supabase.auth
           .signUp(
@@ -75,40 +76,18 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
           .then((value) {
         user = value.user!;
 
-        // Display the overlay to show the status of the email verification
         _overlayController.show();
-        Provider.of<AuthStateProvider>(context, listen: false).addListener(_verificationListener);
       }).onError((AuthException error, _) {
-        showToast(context: context, message: error.message, type: ToastType.error, vsync: this, dismissible: true);
+        if (mounted) {
+          showToast(context: context, message: error.message, type: ToastType.error, vsync: this, dismissible: true);
+        }
       }).whenComplete(() => setState(() => _isLoading = false));
     }
   }
 
-  Future<void> _verificationListener() async {
-    final currSession = Provider.of<AuthStateProvider>(context, listen: false).authSession;
-    final errorMessage = Provider.of<AuthStateProvider>(context, listen: false).errorMessage;
-
-    if (errorMessage != null) {
-      setState(() {
-        _status = errorMessage;
-        _statusIndicator = const Icon(Icons.error, color: Colors.redAccent);
-      });
-    } else if (currSession != null) {
-      session = currSession;
-
-      setState(() {
-        _status = 'Verification complete';
-        _statusIndicator = const Icon(Icons.check, color: Colors.green);
-      });
-    }
-
-    await Future.delayed(const Duration(seconds: 2));
-    _overlayController.hide();
-  }
-
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -117,45 +96,8 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
               Column(
                 children: [
                   const SizedBox(height: 20),
-                  const Column(
-                    children: [
-                      Row(
-                        children: [
-                          AutoSizeText(
-                            "WELCOME",
-                            style: TextStyle(
-                              color: ThemeColor.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                          AutoSizeText(
-                            "ATHLETES",
-                            style: TextStyle(
-                              color: ThemeColor.white,
-                              fontSize: 24,
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 5),
-                      AutoSizeText(
-                        "CREATE AN ACCOUNT TO START YOUR WORKOUT JOURNEY",
-                        style: TextStyle(
-                          color: ThemeColor.white,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: ThemeColor.secondary.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -167,7 +109,7 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
                             type: FieldType.text,
                             decoration: FieldDecoration.filled,
                             label: 'Email',
-                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            labelStyle: const TextStyle(color: ThemeColor.primary),
                             icon: Icons.email,
                             validator: _validateEmail,
                             fillColor: Colors.transparent,
@@ -178,7 +120,7 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
                             type: FieldType.password,
                             decoration: FieldDecoration.filled,
                             label: 'Password',
-                            labelStyle: const TextStyle(color: ThemeColor.tertiary),
+                            labelStyle: const TextStyle(color: ThemeColor.primary),
                             icon: Icons.lock,
                             validator: _validatePassword,
                             fillColor: Colors.transparent,
@@ -193,29 +135,44 @@ class _UserFormState extends State<UserForm> with TickerProviderStateMixin {
               ElevatedButton(
                 onPressed: () => _submit(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeColor.accent,
+                  backgroundColor: ThemeColor.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: ThemeColor.primary) //
+                    ? const CircularProgressIndicator(color: ThemeColor.black) //
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          AutoSizeText("Next", style: TextStyle(color: ThemeColor.primary, fontSize: 20)),
-                          SizedBox(width: 5),
-                          Icon(Icons.arrow_forward_ios, color: ThemeColor.primary, size: 20),
+                          AutoSizeText("Next", style: TextStyle(color: ThemeColor.black, fontSize: 20)),
+                          SizedBox(width: 15),
+                          Icon(Icons.arrow_forward_ios, color: ThemeColor.black, size: 20),
                         ],
                       ),
               ),
               OverlayPortal(
                 controller: _overlayController,
                 overlayChildBuilder: (BuildContext context) => StatusAlertDialog(
-                  title: const AutoSizeText('Verification', style: TextStyle(color: ThemeColor.white, fontWeight: FontWeight.bold)),
-                  currentStatusIndicator: _statusIndicator,
-                  currentStatusText: _status,
+                  statusIndicator: const Text('VERIFICATION', style: TextStyle(color: ThemeColor.primary, fontSize: 30, fontWeight: FontWeight.bold)),
+                  statusMessage: "Check your email to verify your account",
+                  actions: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _overlayController.hide();
+                          widget.onSuccess();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeColor.primary,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                        ),
+                        child: const Text('Continue', style: TextStyle(color: ThemeColor.black, fontSize: 16)),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ],
